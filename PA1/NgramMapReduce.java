@@ -82,66 +82,67 @@ public class NgramMapReduce extends Configured implements Tool {
 
       }
     }
-
-    public static class IntSumReducer extends Reducer<Text, VolumeWriteable, Text, VolumeWriteable> {
-      private VolumeWriteable volume = new VolumeWriteable();
-      private MapWritable map = new MapWritable();
-      private IntWritable defaultInt = new IntWritable(1);
-
-      public void reduce(Text key, Iterable<VolumeWriteable> values, Context context)
-          throws IOException, InterruptedException {
-        int sum = 0;
-        for (VolumeWriteable value : values) {
-          sum++;
-        }
-        volume.set(new MapWritable(), new IntWritable(sum));
-        volume.insertMapValue(defaultInt, defaultInt);
-        context.write(key, volume);
-      }
-
-    }
-
-    public static int runJob(Configuration conf, String inputDir, String outputDir) throws Exception {
-      // function to run Job
-
-      Job job = Job.getInstance(conf, "ngram");
-
-      job.setJarByClass(NgramMapReduce.class);
-      job.setMapperClass(TokenizerMapper.class);
-      job.setCombinerClass(IntSumReducer.class);
-      job.setReducerClass(IntSumReducer.class);
-
-      job.setOutputKeyClass(Text.class);
-      job.setOutputValueClass(IntWritable.class);
-
-      FileInputFormat.addInputPath(job, new Path(inputDir));
-      FileOutputFormat.setOutputPath(job, new Path(outputDir));
-
-      return job.waitForCompletion(true) ? 0 : 1;
-    }
-
-    public static void main(String[] args) throws Exception {
-      // ToolRunner allows for command line configuration parameters - suitable for
-      // shifting between local job and yarn
-      // example command: hadoop jar <path_to_jar.jar> <main_class> -D param=value
-      // <input_path> <output_path>
-      // We use -D mapreduce.framework.name=<value> where <value>=local means the job
-      // is run locally and <value>=yarn means using YARN
-      int res = ToolRunner.run(new Configuration(), new NgramMapReduce(), args);
-      System.exit(res); // res will be 0 if all tasks are executed succesfully and 1 otherwise
-    }
-
-    @Override
-    public int run(String[] args) throws Exception {
-      Configuration conf = this.getConf();
-      Profiles profiles[] = { Profiles.A1, Profiles.A2, Profiles.B1, Profiles.B2 };
-      for (Profiles p : profiles) {
-        conf.setEnum("profile", p);
-        System.out.println("For profile: " + p.toString());
-        if (runJob(conf, args[0], args[1] + p.toString()) != 0)
-          return 1; // error
-      }
-      return 0; // success
-    }
   }
+
+  public static class IntSumReducer extends Reducer<Text, VolumeWriteable, Text, VolumeWriteable> {
+    private VolumeWriteable volume = new VolumeWriteable();
+    private MapWritable map = new MapWritable();
+    private IntWritable defaultInt = new IntWritable(1);
+
+    public void reduce(Text key, Iterable<VolumeWriteable> values, Context context)
+        throws IOException, InterruptedException {
+      int sum = 0;
+      for (VolumeWriteable value : values) {
+        sum++;
+      }
+      volume.set(new MapWritable(), new IntWritable(sum));
+      volume.insertMapValue(defaultInt, defaultInt);
+      context.write(key, volume);
+    }
+
+  }
+
+  public static int runJob(Configuration conf, String inputDir, String outputDir) throws Exception {
+    // function to run Job
+
+    Job job = Job.getInstance(conf, "ngram");
+
+    job.setJarByClass(NgramMapReduce.class);
+    job.setMapperClass(TokenizerMapper.class);
+    job.setCombinerClass(IntSumReducer.class);
+    job.setReducerClass(IntSumReducer.class);
+
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+
+    FileInputFormat.addInputPath(job, new Path(inputDir));
+    FileOutputFormat.setOutputPath(job, new Path(outputDir));
+
+    return job.waitForCompletion(true) ? 0 : 1;
+  }
+
+  public static void main(String[] args) throws Exception {
+    // ToolRunner allows for command line configuration parameters - suitable for
+    // shifting between local job and yarn
+    // example command: hadoop jar <path_to_jar.jar> <main_class> -D param=value
+    // <input_path> <output_path>
+    // We use -D mapreduce.framework.name=<value> where <value>=local means the job
+    // is run locally and <value>=yarn means using YARN
+    int res = ToolRunner.run(new Configuration(), new NgramMapReduce(), args);
+    System.exit(res); // res will be 0 if all tasks are executed succesfully and 1 otherwise
+  }
+
+  @Override
+  public int run(String[] args) throws Exception {
+    Configuration conf = this.getConf();
+    Profiles profiles[] = { Profiles.A1, Profiles.A2, Profiles.B1, Profiles.B2 };
+    for (Profiles p : profiles) {
+      conf.setEnum("profile", p);
+      System.out.println("For profile: " + p.toString());
+      if (runJob(conf, args[0], args[1] + p.toString()) != 0)
+        return 1; // error
+    }
+    return 0; // success
+  }
+
 }
