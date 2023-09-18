@@ -136,7 +136,7 @@ public class NgramMapReduce extends Configured implements Tool {
       for (Profiles p : profiles) {
         conf.setEnum("profile", p);
         System.out.println("For profile: " + p.toString());
-        if (run(conf, args[0], args[1] + p.toString()) != 0)
+        if (runJob(conf, args[0], args[1] + p.toString()) != 0)
           return 1; // error
       }
       return 0; // success
