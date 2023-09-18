@@ -51,13 +51,15 @@ public class NgramMapReduce extends Configured implements Tool {
   }
 
   public static class TokenizerMapper extends Mapper<Object, BytesWritable, Text, VolumeWriteable> {
+    IntWritable defaultInt = new IntWritable(1);
+    MapWritable defaultMap = new MapWritable();
 
-    private VolumeWriteable volume = new VolumeWriteable(map, one);
-    private Text inputString = Text();
+    private VolumeWriteable volume = new VolumeWriteable(defaultMap, defaultInt);
+    private Text inputString = new Text();
 
     public void map(Object key, BytesWritable bWriteable, Context context) throws IOException, InterruptedException {
       Profiles profile = context.getConfiguration().getEnum("profile", Profiles.A1); // get profile
-      volume.insertMapValue(one, one);
+      volume.insertMapValue(defaultInt, defaultInt);
 
       // code to get a book
       String rawText = new String(bWriteable.getBytes());
@@ -85,7 +87,7 @@ public class NgramMapReduce extends Configured implements Tool {
   public static class IntSumReducer extends Reducer<Text, VolumeWriteable, Text, VolumeWriteable> {
     private VolumeWriteable volume = new VolumeWriteable();
     private MapWritable map = new MapWritable();
-    private IntWritable volumenum = new IntWritable(1);
+    private IntWritable defaultInt = new IntWritable(1);
 
     public void reduce(Text key, Iterable<VolumeWriteable> values, Context context)
         throws IOException, InterruptedException {
@@ -94,7 +96,7 @@ public class NgramMapReduce extends Configured implements Tool {
         sum++;
       }
       volume.set(new MapWritable(), new IntWritable(sum));
-      volume.insertMapValue(volumenum, volumenum);
+      volume.insertMapValue(defaultInt, defaultInt);
       context.write(key, volume);
     }
 
