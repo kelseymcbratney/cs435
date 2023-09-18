@@ -13,7 +13,7 @@ public class Book {
   public Book(String rawText, int ngramCount) {
     this.ngramCount = ngramCount;
 
-    parser = Pattern.compile("\\*\\*\\* START OF THIS PROJECT GUTENBERG EBOOK (.+?) \\*\\*\\*");
+    Pattern parser = Pattern.compile("\\*\\*\\* START OF THIS PROJECT GUTENBERG EBOOK (.+?) \\*\\*\\*");
     String[] raw = rawText.split(parser, 2);
     headerText = raw[0];
     bodyText = raw[1];
@@ -70,7 +70,7 @@ public class Book {
     } else {
       String cleanedText = loweredTextstr.replaceAll("\\s+", " ").replaceAll("'", "");
       string bigramsText = cleanedText.replaceAll("[.!?]", " _END_ _START_");
-      bigramsText = "_START_" + bigramsText;
+      bigramsText = "_START_ " + bigramsText;
       return bigramsText;
     }
   }
