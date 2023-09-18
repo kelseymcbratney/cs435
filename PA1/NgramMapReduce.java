@@ -129,8 +129,9 @@ public class NgramMapReduce extends Configured implements Tool {
       System.exit(res); // res will be 0 if all tasks are executed succesfully and 1 otherwise
     }
 
+    @Override
     public int run(String[] args) throws Exception {
-      Configuration conf = this.getConf();
+      Configuration conf = getConf();
       Profiles profiles[] = { Profiles.A1, Profiles.A2, Profiles.B1, Profiles.B2 };
       for (Profiles p : profiles) {
         conf.setEnum("profile", p);
