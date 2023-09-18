@@ -68,8 +68,8 @@ public class Book {
       return unigramText;
 
     } else {
-      String cleanedText = loweredTextstr.replaceAll("\\s+", " ").replaceAll("'", "");
-      string bigramsText = cleanedText.replaceAll("[.!?]", " _END_ _START_");
+      String cleanedText = loweredText.replaceAll("\\s+", " ").replaceAll("'", "");
+      String bigramsText = cleanedText.replaceAll("[.!?]", " _END_ _START_");
       bigramsText = "_START_ " + bigramsText;
       return bigramsText;
     }
