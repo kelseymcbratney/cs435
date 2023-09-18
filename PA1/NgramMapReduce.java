@@ -131,7 +131,7 @@ public class NgramMapReduce extends Configured implements Tool {
 
     @Override
     public int run(String[] args) throws Exception {
-      Configuration conf = getConf();
+      Configuration conf = this.getConf();
       Profiles profiles[] = { Profiles.A1, Profiles.A2, Profiles.B1, Profiles.B2 };
       for (Profiles p : profiles) {
         conf.setEnum("profile", p);
