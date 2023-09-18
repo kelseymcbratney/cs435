@@ -118,7 +118,7 @@ public class NgramMapReduce extends Configured implements Tool {
     FileInputFormat.addInputPath(job, new Path(inputDir));
     FileOutputFormat.setOutputPath(job, new Path(outputDir));
 
-    System.exit(job.waitForCompletion(true) ? 0 : 1);
+    return job.waitForCompletion(true) ? 0 : 1;
   }
 
   public static void main(String[] args) throws Exception {
