@@ -100,10 +100,10 @@ public class NgramMapReduce extends Configured implements Tool {
       context.write(key, volume);
     }
 
-    public static void runJob(String[] args) throws Exception {
-      Configuration conf = new Configuration();
-      Job job = Job.getInstance(conf, "ngram");
+    public static int runJob(Configuration conf, String inputDir, String outputDir) throws Exception {
+      // function to run Job
 
+      Job job = Job.getInstance(conf, "ngram");
       job.setJarByClass(NgramMapReduce.class);
       job.setMapperClass(TokenizerMapper.class);
       job.setCombinerClass(IntSumReducer.class);
