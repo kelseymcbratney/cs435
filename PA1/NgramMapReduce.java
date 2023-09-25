@@ -107,17 +107,18 @@ public class NgramMapReduce extends Configured implements Tool {
 
     Job job = Job.getInstance(conf, "ngram");
 
+    job.setInputFormatClass(WholeFileInputFormat.class);
     job.setJarByClass(NgramMapReduce.class);
+
     job.setMapperClass(TokenizerMapper.class);
     job.setCombinerClass(IntSumReducer.class);
     job.setReducerClass(IntSumReducer.class);
 
     job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(IntWritable.class);
+    job.setOutputValueClass(VolumeWriteable.class);
 
     FileInputFormat.addInputPath(job, new Path(inputDir));
     FileOutputFormat.setOutputPath(job, new Path(outputDir));
-
     return job.waitForCompletion(true) ? 0 : 1;
   }
 
