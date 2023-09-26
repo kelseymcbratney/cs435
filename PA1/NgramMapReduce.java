@@ -70,11 +70,32 @@ public class NgramMapReduce extends Configured implements Tool {
         if (profile.profileChar == 'a' && profile.ngramNum == 1) {
           inputText.set(itr.nextToken() + "\t" + book.getBookYear() + "\t");
           context.write(inputText, volume);
+
         } else if (profile.profileChar == 'a' && profile.ngramNum == 2) {
+          String firstWord = "";
+          String secondWord = "";
+          if (itr.hasMoreTokens()) {
+            firstWord = itr.nextToken();
+          }
+          if (itr.hasMoreTokens()) {
+            secondWord = itr.nextToken();
+          }
+          inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookYear());
 
         } else if (profile.profileChar == 'b' && profile.ngramNum == 1) {
+          inputText.set(itr.nextToken() + "\t" + book.getBookAuthor() + "\t");
+          context.write(inputText, volume);
 
         } else if (profile.profileChar == 'b' && profile.ngramNum == 2) {
+          String firstWord = "";
+          String secondWord = "";
+          if (itr.hasMoreTokens()) {
+            firstWord = itr.nextToken();
+          }
+          if (itr.hasMoreTokens()) {
+            secondWord = itr.nextToken();
+          }
+          inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookAuthor());
 
         } else {
           System.out.println("Error: profile not found");
