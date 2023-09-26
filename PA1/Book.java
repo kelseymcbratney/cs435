@@ -24,7 +24,7 @@ public class Book {
   }
 
   private String parseAuthor(String headerText) {
-    Pattern authorPattern = Pattern.compile("Author: (.+?)");
+    Pattern authorPattern = Pattern.compile("Author: (.*?)");
     Matcher authorMatcher = authorPattern.matcher(headerText);
     if (authorMatcher.find()) {
       String authorMatch = authorMatcher.group(1);
@@ -35,7 +35,7 @@ public class Book {
   }
 
   private String parseYear(String headerText) {
-    Pattern yearPattern = Pattern.compile("Release Date: (.+?)");
+    Pattern yearPattern = Pattern.compile("Release Date: (.*?)");
     Matcher yearMatcher = yearPattern.matcher(headerText);
     if (yearMatcher.find()) {
       String yearMatch = yearMatcher.group(1);
