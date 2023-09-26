@@ -13,7 +13,7 @@ public class Book {
   public Book(String rawText, int ngramCount) {
     this.ngramCount = ngramCount;
 
-    String pattern = ("\\*\\*\\* START OF THIS PROJECT GUTENBERG EBOOK .* \\*\\*\\*");
+    String pattern = ("\\*\\*\\*");
     String[] raw = rawText.split(pattern, 2);
     headerText = raw[0];
     bodyText = raw[1];
