@@ -69,6 +69,7 @@ public class NgramMapReduce extends Configured implements Tool {
       while (itr.hasMoreTokens()) {
         if (profile.profileChar == 'a' && profile.ngramNum == 1) {
           inputText.set(itr.nextToken() + "\t" + book.getBookYear() + "\t");
+          volume.insertMapValue(new IntWritable(volume.hashCode()), defaultInt);
           context.write(inputText, volume);
 
         } else if (profile.profileChar == 'a' && profile.ngramNum == 2) {
@@ -120,9 +121,12 @@ public class NgramMapReduce extends Configured implements Tool {
       int sum = 0;
       for (VolumeWriteable value : values) {
         sum++;
+        IntWritable books = value.getVolumeIds().keySet();
+        map.insertMapValue(defaultInt, books);
       }
-      volume.set(new MapWritable(), new IntWritable(sum));
-      volume.insertMapValue(defaultInt, defaultInt);
+
+      volume.set(map, new IntWritable(sum));
+      // volume.insertMapValue(defaultInt, defaultInt);
       context.write(key, volume);
     }
 
