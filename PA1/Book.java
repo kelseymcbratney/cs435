@@ -35,10 +35,10 @@ public class Book {
   }
 
   private String parseYear(String headerText) {
-    Pattern yearPattern = Pattern.compile("Release Date: (\\d{4})");
+    Pattern yearPattern = Pattern.compile("Release Date: \\S+( \\d{1,2},)? (\\d{4})");
     Matcher yearMatcher = yearPattern.matcher(headerText);
     if (yearMatcher.find()) {
-      String yearMatch = yearMatcher.group(1);
+      String yearMatch = yearMatcher.group(2);
       return yearMatch;
     }
 
