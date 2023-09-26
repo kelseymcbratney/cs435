@@ -70,6 +70,7 @@ public class Book {
     } else {
       String cleanedText = loweredText.replaceAll("\\s+", " ").replaceAll("'", "");
       String bigramsText = cleanedText.replaceAll("[.!?]", " _END_ _START_");
+      bigramsText = bigramsText.replaceAll("[^a-z\\s]", "");
       bigramsText = "_START_ " + bigramsText;
       return bigramsText;
     }
