@@ -81,10 +81,12 @@ public class NgramMapReduce extends Configured implements Tool {
             secondWord = itr.nextToken();
           }
           inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookYear());
+          volume.insertMapValue(new IntWritable(volume.hashCode()), defaultInt);
           context.write(inputText, volume);
 
         } else if (profile.profileChar == 'b' && profile.ngramNum == 1) {
           inputText.set(itr.nextToken() + "\t" + book.getBookAuthor() + "\t");
+          volume.insertMapValue(new IntWritable(volume.hashCode()), defaultInt);
           context.write(inputText, volume);
 
         } else if (profile.profileChar == 'b' && profile.ngramNum == 2) {
@@ -97,6 +99,7 @@ public class NgramMapReduce extends Configured implements Tool {
             secondWord = itr.nextToken();
           }
           inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookAuthor());
+          volume.insertMapValue(new IntWritable(volume.hashCode()), defaultInt);
           context.write(inputText, volume);
 
         } else {
