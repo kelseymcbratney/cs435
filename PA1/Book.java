@@ -15,8 +15,11 @@ public class Book {
 
     String pattern = ("\\*\\*\\* START OF THIS PROJECT GUTENBERG EBOOK.*?\\*\\*\\*");
     String[] raw = rawText.split(pattern);
-    headerText = raw[0];
-    bodyText = raw[1];
+
+    if (parts.length >= 2) {
+      headerText = raw[0];
+      bodyText = raw[1];
+    }
 
     bodyText = formatBook(bodyText);
     author = parseAuthor(headerText);
