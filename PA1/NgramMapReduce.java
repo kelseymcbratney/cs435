@@ -81,6 +81,7 @@ public class NgramMapReduce extends Configured implements Tool {
             secondWord = itr.nextToken();
           }
           inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookYear());
+          context.write(inputText, volume);
 
         } else if (profile.profileChar == 'b' && profile.ngramNum == 1) {
           inputText.set(itr.nextToken() + "\t" + book.getBookAuthor() + "\t");
@@ -96,6 +97,7 @@ public class NgramMapReduce extends Configured implements Tool {
             secondWord = itr.nextToken();
           }
           inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookAuthor());
+          context.write(inputText, volume);
 
         } else {
           System.out.println("Error: profile not found");
