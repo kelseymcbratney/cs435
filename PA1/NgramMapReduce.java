@@ -118,12 +118,13 @@ public class NgramMapReduce extends Configured implements Tool {
 
     public void reduce(Text key, Iterable<VolumeWriteable> values, Context context)
         throws IOException, InterruptedException {
-      sum = new IntWritable(0);
+      Int sum = 0;
       for (VolumeWriteable value : values) {
-        sum += value.getCount();
+        sum++;
+        volume.set(new MapWritable(), new IntWritable(sum));
+        volume.insertMapValue(defaultInt, defaultInt);
+
       }
-      volume.set(new MapWritable(), sum);
-      volume.insertMapValue(defaultInt, defaultInt);
       context.write(key, volume);
     }
 
