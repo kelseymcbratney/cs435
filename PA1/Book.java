@@ -16,7 +16,7 @@ public class Book {
     String pattern = ("\\*\\*\\* START OF THIS PROJECT GUTENBERG EBOOK.*?\\*\\*\\*");
     String[] raw = rawText.split(pattern);
 
-    if (parts.length >= 2) {
+    if (raw.length >= 2) {
       headerText = raw[0];
       bodyText = raw[1];
     }
