@@ -24,7 +24,7 @@ public class Book {
   }
 
   private String parseAuthor(String headerText) {
-    Pattern authorPattern = Pattern.compile("Author: (.*?)");
+    Pattern authorPattern = Pattern.compile("Author: ([^\\s]+)(?:\\s|\\s+and\\s+|$)");
     Matcher authorMatcher = authorPattern.matcher(headerText);
     if (authorMatcher.find()) {
       String authorMatch = authorMatcher.group(1);
