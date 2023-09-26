@@ -80,7 +80,7 @@ public class NgramMapReduce extends Configured implements Tool {
           if (itr.hasMoreTokens()) {
             secondWord = itr.nextToken();
           }
-          inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookYear());
+          inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookYear() + "\t");
           volume.insertMapValue(new IntWritable(volume.hashCode()), defaultInt);
           context.write(inputText, volume);
 
@@ -98,7 +98,7 @@ public class NgramMapReduce extends Configured implements Tool {
           if (itr.hasMoreTokens()) {
             secondWord = itr.nextToken();
           }
-          inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookAuthor());
+          inputText.set(firstWord + ' ' + secondWord + "\t" + book.getBookAuthor() + "\t");
           volume.insertMapValue(new IntWritable(volume.hashCode()), defaultInt);
           context.write(inputText, volume);
 
