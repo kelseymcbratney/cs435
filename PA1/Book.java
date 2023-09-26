@@ -16,9 +16,12 @@ public class Book {
     String pattern = ("\\*\\*\\* START OF THIS PROJECT GUTENBERG EBOOK.*?\\*\\*\\*");
     String[] raw = rawText.split(pattern);
 
-    if (raw.length >= 2) {
+    if (raw.length == 2) {
       headerText = raw[0];
       bodyText = raw[1];
+    } else {
+      headerText = "";
+      bodyText = "";
     }
 
     bodyText = formatBook(bodyText);
