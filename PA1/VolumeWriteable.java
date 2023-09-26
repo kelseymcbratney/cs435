@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.MapWritable;
@@ -14,7 +13,6 @@ import org.apache.hadoop.io.Writable;
 public class VolumeWriteable implements Writable {
   private IntWritable count;
   private MapWritable volumeIds;
-  private Map<IntWritable, IntWritable> idMap = new HashMap<>();
 
   public VolumeWriteable(MapWritable volumeIds, IntWritable count) {
     this.volumeIds = volumeIds;
@@ -40,7 +38,7 @@ public class VolumeWriteable implements Writable {
   }
 
   public void insertMapValue(IntWritable key, IntWritable value) {
-    idMap.put(key, value);
+    volumeIds.put(key, value);
   }
 
   @Override
