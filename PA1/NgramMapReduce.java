@@ -126,8 +126,10 @@ public class NgramMapReduce extends Configured implements Tool {
         for (Writable mapKey : value.getVolumeIds().keySet()) {
           // Accumulate the values for each key in the map
           if (map.containsKey(mapKey)) {
+            System.out.println(mapKey);
             IntWritable existingValue = (IntWritable) map.get(mapKey);
             int newValue = existingValue.get() + ((IntWritable) value.getVolumeIds().get(mapKey)).get();
+            System.out.println(newValue);
             map.put(mapKey, new IntWritable(newValue));
           } else {
             map.put(mapKey, (IntWritable) value.getVolumeIds().get(mapKey));
