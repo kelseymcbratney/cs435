@@ -113,22 +113,32 @@ public class NgramMapReduce extends Configured implements Tool {
   }
 
   public static class IntSumReducer extends Reducer<Text, VolumeWriteable, Text, VolumeWriteable> {
-    private VolumeWriteable volume = new VolumeWriteable();
+    private VolumeWriteable result  = new VolumeWriteable();
     private MapWritable map = new MapWritable();
     private IntWritable defaultInt = new IntWritable(1);
 
     public void reduce(Text key, Iterable<VolumeWriteable> values, Context context)
         throws IOException, InterruptedException {
       int sum = 0;
+
       for (VolumeWriteable value : values) {
         sum++;
-        MapWritable newMap = new MapWritable();
-        for (Writable keyList : value.getVolumeIds().keySet())
-          map.put(keyList, value.getVolumeIds().get(keyList);
+        for (Writable mapKey : value.getVolumeIds().keySet()) {
+          // Accumulate the values for each key in the map
+          if (map.containsKey(mapKey)) {
+            IntWritable existingValue = (IntWritable) map.get(mapKey);
+            int newValue = existingValue.get() + ((IntWritable) value.getVolumeIds().get(mapKey)).get();
+            map.put(mapKey, new IntWritable(newValue));
+          } else {
+            map.put(mapKey, (IntWritable) value.getVolumeIds().get(mapKey));
+          }
+        }
       }
-      volume.set(new MapWritable(map), new IntWritable(sum));
-      volume.insertMapValue(defaultInt, defaultInt);
-      context.write(key, volume);
+
+      result.set(new MapWritable(map), new IntWritable(sum));
+      result.insertMapValue(defaultInt, defaultInt);
+
+      context.write(key, result);
     }
 
   }
