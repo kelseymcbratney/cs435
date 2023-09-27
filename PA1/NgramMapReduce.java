@@ -129,7 +129,7 @@ public class NgramMapReduce extends Configured implements Tool {
         }
       }
 
-      result.set(new MapWritable(map), new IntWritable(sum));
+      result.set((map), new IntWritable(sum));
 
       context.write(key, result);
     }
