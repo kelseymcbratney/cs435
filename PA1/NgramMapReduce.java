@@ -124,8 +124,8 @@ public class NgramMapReduce extends Configured implements Tool {
       for (VolumeWriteable value : values) {
         sum += value.getCount().get();
         for (Writable mapKey : value.getVolumeIds().keySet()) {
-          IntWritable mapKeyWritable = (IntWritable);
-          map.put(mapKey, defaultInt);
+          IntWritable mapKeyInt = (IntWritable) mapKey;
+          map.put(mapKeyInt, defaultInt);
         }
       }
 
