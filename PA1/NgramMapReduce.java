@@ -132,6 +132,7 @@ public class NgramMapReduce extends Configured implements Tool {
             System.out.println(newValue);
             map.put(mapKey, new IntWritable(newValue));
           } else {
+            System.out.println(value.getVolumeIds().get(mapKey));
             map.put(mapKey, (IntWritable) value.getVolumeIds().get(mapKey));
           }
         }
