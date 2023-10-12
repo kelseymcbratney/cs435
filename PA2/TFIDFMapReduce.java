@@ -23,19 +23,7 @@ public class TFIDFMapReduce {
       // Tokenize the input text
       StringTokenizer tokenizer = new StringTokenizer(value.toString());
       // Calculate TF (Term Frequency)
-      Map<String, Int      int sum = 0;
-
-      for (VolumeWriteable value : values) {
-        sum += value.getCount().get();
-        for (Writable mapKey : value.getVolumeIds().keySet()) {
-          IntWritable mapKeyInt = (IntWritable) mapKey;
-          map.insertMapValue(mapKeyInt, defaultInt);
-        }
-      }
-
-      result.set((map), new IntWritable(sum));
-
-      context.write(key, result);eger> termFrequency = new HashMap<>();
+      Map<String, Integer> termFrequency = new HashMap<>();
       int totalTerms = 0;
 
       while (tokenizer.hasMoreTokens()) {
@@ -149,3 +137,4 @@ public class TFIDFMapReduce {
     System.exit(job2.waitForCompletion(true) ? 0 : 1);
   }
 }
+
