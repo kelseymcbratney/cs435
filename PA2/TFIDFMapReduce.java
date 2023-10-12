@@ -1,3 +1,5 @@
+package TFIDFMapReduce;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
@@ -137,4 +139,3 @@ public class TFIDFMapReduce {
     System.exit(job2.waitForCompletion(true) ? 0 : 1);
   }
 }
-
