@@ -54,51 +54,52 @@ public class TFIDFMapReduce {
       context.write(key, value);
     }
   }
-}
 
-// Job2: Calculate TF values
-public static class Job2Mapper extends Mapper<Text, Text, Text, Text> {
-  private Text docID = new Text();
-  private Text termFrequency = new Text();
-
-  public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
-    // Parse input and calculate TF values
-    String docIDStr = key.toString();
-    String articleBody = value.toString();
-    StringTokenizer tokenizer = new StringTokenizer(articleBody);
-
-    // Calculate max frequency
-    int maxFrequency = 0;
-    while (tokenizer.hasMoreTokens()) {
-      String term = tokenizer.nextToken();
-      // Update maxFrequency if necessary
-      // ...
-
-      // Calculate TF values
-      // double tf = 0.5 + 0.5 * (/* term frequency */ / maxFrequency);
-      docID.set(docIDStr);
-      termFrequency.set(Double.toString(tf));
-      context.write(docID, termFrequency);
-    }
-  }
-}
-
-public static class Job2Reducer extends Reducer<Text, Text, Text, Text> {
-  public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-    // Calculate max frequency for the article
-    double maxFrequency = 0;
-    for (Text value : values) {
-      double tf = Double.parseDouble(value.toString());
-      // Update maxFrequency if necessary
-    }
-
-    // Calculate and output TF values
-    for (Text value : values) {
-      double tf = Double.parseDouble(value.toString());
-      double tfValue = tf / maxFrequency;
-      context.write(key, new Text(Double.toString(tfValue)));
-    }
-  }
+  // // Job2: Calculate TF values
+  // public static class Job2Mapper extends Mapper<Text, Text, Text, Text> {
+  // private Text docID = new Text();
+  // private Text termFrequency = new Text();
+  //
+  // public void map(Text key, Text value, Context context) throws IOException,
+  // InterruptedException {
+  // // Parse input and calculate TF values
+  // String docIDStr = key.toString();
+  // String articleBody = value.toString();
+  // StringTokenizer tokenizer = new StringTokenizer(articleBody);
+  //
+  // // Calculate max frequency
+  // int maxFrequency = 0;
+  // while (tokenizer.hasMoreTokens()) {
+  // String term = tokenizer.nextToken();
+  // // Update maxFrequency if necessary
+  // // ...
+  //
+  // // Calculate TF values
+  // // double tf = 0.5 + 0.5 * (/* term frequency */ / maxFrequency);
+  // docID.set(docIDStr);
+  // termFrequency.set(Double.toString(tf));
+  // context.write(docID, termFrequency);
+  // }
+  // }
+  // }
+  //
+  // public static class Job2Reducer extends Reducer<Text, Text, Text, Text> {
+  // public void reduce(Text key, Iterable<Text> values, Context context) throws
+  // IOException, InterruptedException {
+  // // Calculate max frequency for the article
+  // double maxFrequency = 0;
+  // for (Text value : values) {
+  // double tf = Double.parseDouble(value.toString());
+  // // Update maxFrequency if necessary
+  // }
+  //
+  // // Calculate and output TF values
+  // for (Text value : values) {
+  // double tf = Double.parseDouble(value.toString());
+  // double tfValue = tf / maxFrequency;
+  // context.write(key, new Text(Double.toString(tfValue)));
+  // }
+  // }
 
   // Job3: Calculate IDF and TF-IDF values
   // public static class Job3Mapper extends Mapper<Text, Text, Text, Text> {
