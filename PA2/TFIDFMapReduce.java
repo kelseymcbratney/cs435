@@ -47,11 +47,11 @@ public class TFIDFMapReduce {
     public void reduce(Text key, Iterable<IntWritable> values, Context context)
         throws IOException, InterruptedException {
       int sum = 0;
-      for (Text value : values) {
+      for (IntWritable value : values) {
         sum += val.get();
       }
       unigramCount.set(sum);
-      context.write(key, value);
+      context.write(key, unigramCount);
     }
   }
 
