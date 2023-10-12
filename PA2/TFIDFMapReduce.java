@@ -1,141 +1,168 @@
 package TFIDFMapReduce;
 
+import java.io.IOException;
+import java.util.StringTokenizer;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
+import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
+import org.apache.hadoop.util.GenericOptionsParser;
+import org.apache.hadoop.io.IntWritable;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-
-public class TFIDFMapReduce {
-
-  // Job 1: Calculate TF, IDF, and TF-IDF values for terms
-  public static class TFIDFMapper1 extends Mapper<LongWritable, Text, Text, MapWritable> {
-    private final Text word = new Text();
-    private final MapWritable outputValue = new MapWritable();
+public class TFIDFJob {
+  // Job1: Extract docID and article body
+  public static class Job1Mapper extends Mapper<LongWritable, Text, Text, Text> {
+    private Text docID = new Text();
+    private Text unigram = new Text();
+    private IntWritable defaultOne = new IntWritable(1);
 
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-      // Tokenize the input text
-      StringTokenizer tokenizer = new StringTokenizer(value.toString());
-      // Calculate TF (Term Frequency)
-      Map<String, Integer> termFrequency = new HashMap<>();
-      int totalTerms = 0;
+      // Parse input line and extract docID and article body
+      String line = value.toString();
+      int delimIndex = line.indexOf("<====>");
+      if (delimIndex >= 0) {
+        docID.set(line.substring(0, delimIndex).trim());
+        String body = line.substring(delimIndex + 8).trim();
 
-      while (tokenizer.hasMoreTokens()) {
-        String token = tokenizer.nextToken();
-        termFrequency.put(token, termFrequency.getOrDefault(token, 0) + 1);
-        totalTerms++;
-      }
-
-      // Calculate TF for each term
-      for (Map.Entry<String, Integer> entry : termFrequency.entrySet()) {
-        word.set(entry.getKey());
-        outputValue.clear();
-        outputValue.put(new Text("TF"), new IntWritable(entry.getValue()));
-        outputValue.put(new Text("TotalTerms"), new IntWritable(totalTerms));
-        context.write(word, outputValue);
+        // Remove non-alphanumeric characters and split into unigrams
+        String[] words = body.split("[^A-Za-z0-9]+");
+        for (String word : words) {
+          if (!word.isEmpty()) {
+            unigram.set(docID + '\t' + word.toLowerCase());
+            context.write(unigram, defaultOne); // docID, Unigram, Count
+          }
+        }
       }
     }
   }
 
-  public static class TFIDFReducer1 extends Reducer<Text, MapWritable, Text, MapWritable> {
-    private final Map<String, Integer> documentFrequency = new HashMap<>();
-    private final MapWritable outputValue = new MapWritable();
+  public static class Job1Reducer extends Reducer<Text, Text, Text, Text> {
+    private IntWritable unigramCount = new IntWritable();
 
-    public void reduce(Text key, Iterable<MapWritable> values, Context context)
+    public void reduce(Text key, Iterable<IntWritable> values, Context context)
         throws IOException, InterruptedException {
-      int df = 0;
-      for (MapWritable value : values) {
-        df++;
-      }
-      documentFrequency.put(key.toString(), df);
-
-      outputValue.clear();
-      outputValue.put(new Text("DF"), new IntWritable(df));
-      context.write(key, outputValue);
-    }
-  }
-
-  // Job 2: Generate a summary using TF-IDF values
-  public static class TFIDFMapper2 extends Mapper<LongWritable, Text, Text, Text> {
-    private final Text word = new Text();
-    private final Text outputValue = new Text();
-
-    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-      // Parse input values
-      String[] parts = value.toString().split("\t");
-      if (parts.length == 2) {
-        word.set(parts[0]);
-        outputValue.set(parts[1]);
-        context.write(word, outputValue);
-      }
-    }
-  }
-
-  public static class TFIDFReducer2 extends Reducer<Text, Text, Text, Text> {
-    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-      // Generate the summary using TF-IDF values (no need to re-calculate IDF here)
-      StringBuilder summary = new StringBuilder();
+      int sum = 0;
       for (Text value : values) {
-        summary.append(value.toString()).append("\t");
+        sum += val.get();
       }
-
-      context.write(key, new Text(summary.toString()));
+      unigramCount.set(sum);
+      context.write(key, value);
     }
   }
+}
+
+// Job2: Calculate TF values
+public static class Job2Mapper extends Mapper<Text, Text, Text, Text> {
+  private Text docID = new Text();
+  private Text termFrequency = new Text();
+
+  public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
+    // Parse input and calculate TF values
+    String docIDStr = key.toString();
+    String articleBody = value.toString();
+    StringTokenizer tokenizer = new StringTokenizer(articleBody);
+
+    // Calculate max frequency
+    int maxFrequency = 0;
+    while (tokenizer.hasMoreTokens()) {
+      String term = tokenizer.nextToken();
+      // Update maxFrequency if necessary
+      // ...
+
+      // Calculate TF values
+      // double tf = 0.5 + 0.5 * (/* term frequency */ / maxFrequency);
+      docID.set(docIDStr);
+      termFrequency.set(Double.toString(tf));
+      context.write(docID, termFrequency);
+    }
+  }
+}
+
+public static class Job2Reducer extends Reducer<Text, Text, Text, Text> {
+  public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+    // Calculate max frequency for the article
+    double maxFrequency = 0;
+    for (Text value : values) {
+      double tf = Double.parseDouble(value.toString());
+      // Update maxFrequency if necessary
+    }
+
+    // Calculate and output TF values
+    for (Text value : values) {
+      double tf = Double.parseDouble(value.toString());
+      double tfValue = tf / maxFrequency;
+      context.write(key, new Text(Double.toString(tfValue)));
+    }
+  }
+
+  // Job3: Calculate IDF and TF-IDF values
+  // public static class Job3Mapper extends Mapper<Text, Text, Text, Text> {
+  // public void map(Text key, Text value, Context context) throws IOException,
+  // InterruptedException {
+  // // Input: docID, TF value
+  // // Calculate IDF and TF-IDF values
+  // // Output: docID, TF-IDF value
+  // }
+  // }
+  //
+  // public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
+  // private long N;
+  //
+  // protected void setup(Context context) throws IOException,
+  // InterruptedException {
+  // // Fetch the total number of documents from a Counter (set in a previous job)
+  // N = context.getConfiguration().getLong("total_documents", 0);
+  // }
+  //
+  // public void reduce(Text key, Iterable<Text> values, Context context) throws
+  // IOException, InterruptedException {
+  // // Calculate IDF and TF-IDF values using the provided formula
+  // // Output: docID, TF-IDF value
+  // pass
+  // }
+  //
+  // }
 
   public static void main(String[] args) throws Exception {
-    Configuration conf1 = new Configuration();
-    Job job1 = Job.getInstance(conf1, "TF-IDF Calculation");
-    job1.setJarByClass(TFIDFMapReduce.class);
+    Configuration conf = new Configuration();
+    Job job1 = Job.getInstance(conf, "Job1");
+    // Set job1 Mapper, Reducer, InputFormat, and OutputFormat
 
-    // Set the input and output paths for Job 1
-    FileInputFormat.addInputPath(job1, new Path(args[0]));
-    FileOutputFormat.setOutputPath(job1, new Path(args[1]));
+    Job job2 = Job.getInstance(conf, "Job2");
+    // Set job2 Mapper, Reducer, InputFormat, and OutputFormat
+    // Set job2 Reducer to use multiple reducers if necessary
 
-    // Set the mapper and reducer classes for Job 1
-    job1.setMapperClass(TFIDFMapper1.class);
-    job1.setReducerClass(TFIDFReducer1.class);
+    Job job3 = Job.getInstance(conf, "Job3");
+    // Set job3 Mapper, Reducer, InputFormat, and OutputFormat
 
-    // Set the input and output formats for Job 1
-    job1.setInputFormatClass(TextInputFormat.class);
-    job1.setOutputFormatClass(TextOutputFormat.class);
+    // Create a JobControl and add the jobs as ControlledJobs
+    JobControl jobControl = new JobControl("TFIDFJob");
+    ControlledJob controlledJob1 = new ControlledJob(job1.getConfiguration());
+    // ControlledJob controlledJob2 = new ControlledJob(job2.getConfiguration());
+    // ControlledJob controlledJob3 = new ControlledJob(job3.getConfiguration());
 
-    // Set the output key and value classes for Job 1
-    job1.setOutputKeyClass(Text.class);
-    job1.setOutputValueClass(MapWritable.class);
+    // Add dependencies between jobs if needed (e.g., job2 depends on job1)
+    // controlledJob2.addDependingJob(controlledJob1);
+    // controlledJob3.addDependingJob(controlledJob2);
 
-    // Run Job 1
-    job1.waitForCompletion(true);
+    // Add the controlled jobs to the JobControl
+    jobControl.addJob(controlledJob1);
+    // jobControl.addJob(controlledJob2);
+    // jobControl.addJob(controlledJob3);
 
-    Configuration conf2 = new Configuration();
-    Job job2 = Job.getInstance(conf2, "Summary Generation");
-    job2.setJarByClass(TFIDFMapReduce.class);
+    // Start the JobControl thread
+    Thread jobControlThread = new Thread(jobControl);
+    jobControlThread.start();
 
-    // Set the input and output paths for Job 2
-    FileInputFormat.addInputPath(job2, new Path(args[1]));
-    FileOutputFormat.setOutputPath(job2, new Path(args[2]));
-
-    // Set the mapper and reducer classes for Job 2
-    job2.setMapperClass(TFIDFMapper2.class);
-    job2.setReducerClass(TFIDFReducer2.class);
-
-    // Set the input and output formats for Job 2
-    job2.setInputFormatClass(TextInputFormat.class);
-    job2.setOutputFormatClass(TextOutputFormat.class);
-
-    // Set the output key and value classes for Job 2
-    job2.setOutputKeyClass(Text.class);
-    job2.setOutputValueClass(Text.class);
-
-    // Run Job 2
-    System.exit(job2.waitForCompletion(true) ? 0 : 1);
+    // Wait for the JobControl thread to finish
+    while (!jobControl.allFinished()) {
+      Thread.sleep(1000);
+    }
+    System.exit(jobControl.getFailedJobList().size());
   }
 }
