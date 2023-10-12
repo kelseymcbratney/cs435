@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.util.GenericOptionsParser;
+import org.w3c.dom.Text;
 import org.apache.hadoop.io.IntWritable;
 
 public class TFIDFMapReduce {
@@ -33,7 +34,7 @@ public class TFIDFMapReduce {
         String[] words = body.split("[^A-Za-z0-9]+");
         for (String word : words) {
           if (!word.isEmpty()) {
-            unigram.set(docID + '\t' + word.toLowerCase());
+            unigram.set(docID.toString() + '\t' + word.toLowerCase());
             context.write(unigram, defaultOne); // docID, Unigram, Count
           }
         }
