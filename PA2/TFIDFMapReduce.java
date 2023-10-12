@@ -16,12 +16,12 @@ import org.apache.hadoop.io.IntWritable;
 
 public class TFIDFMapReduce {
   // Job1: Extract docID and article body
-  public static class Job1Mapper extends Mapper<LongWritable, Text, Text, Text> {
+  public static class Job1Mapper extends Mapper<Object, Text, Text, Text> {
     private Text docID = new Text();
     private Text unigram = new Text();
     private IntWritable defaultOne = new IntWritable(1);
 
-    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
       // Parse input line and extract docID and article body
       String line = value.toString();
       int delimIndex = line.indexOf("<====>");
@@ -48,7 +48,7 @@ public class TFIDFMapReduce {
         throws IOException, InterruptedException {
       int sum = 0;
       for (IntWritable value : values) {
-        sum += val.get();
+        sum += value.get();
       }
       unigramCount.set(sum);
       context.write(key, unigramCount);
