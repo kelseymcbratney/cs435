@@ -14,7 +14,7 @@ import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.io.IntWritable;
 
-public class TFIDFJob {
+public class TFIDFMapReduce {
   // Job1: Extract docID and article body
   public static class Job1Mapper extends Mapper<LongWritable, Text, Text, Text> {
     private Text docID = new Text();
