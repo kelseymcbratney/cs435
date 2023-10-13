@@ -58,10 +58,10 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         docID.set(docIDString);
 
         // Extract and clean text
-        String text = line.substring(docIDMatcher.end()).replaceAll("[^A-Za-z0-9 ]", "").toLowerCase();
+        String text = line.substring(docIDMatcher.end()).replaceAll("[^A-Za-z0-9 .]", "").toLowerCase();
 
         // Split the text into unigrams
-        String[] sentences = text.split(".");
+        String[] sentences = text.split(". ");
 
         for (String sentence : sentences) {
           if (!sentence.isEmpty()) {
@@ -76,19 +76,47 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
   }
 
   // Reducer: Generate Summary based on TF-IDF values
-  public static class SummaryReducer extends Reducer<Text, DoubleWritable, Text, Text> {
-    public void reduce(Text key, Iterable<DoubleWritable> values, Context context)
-        throws IOException, InterruptedException {
-      int foo = 0;
-      // Calculate summary based on TF-IDF values and emit (DocID, Summary) pairs
+  public static class SummaryReducer extends Reducer<Text, Text, NullWritable, Text> {
+    public string generateSummary(List<String> tfidfValues) {
+      // Sort the TF-IDF values
+      Collections.sort(tfidfValues);
+      // Get the top 5 TF-IDF values
+      List<Double> top5TFIDFValues = tfidfValues.subList(tfidfValues.size() - 5, tfidfValues.size());
+      // Calculate the average of the top 5 TF-IDF values
+      double averageTop5TFIDFValues = top5TFIDFValues.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
+      // Get the sentences that have TF-IDF values greater than the average of the top
+      // 5 TF-IDF values
+      List<String> summarySentences = new ArrayList<>();
+      for (Double tfidfValue : tfidfValues) {
+        if (tfidfValue > averageTop3TFIDFValues) {
+          summarySentences.add(tfidfValue);
+        }
+      }
+      // Sort the sentences by the TF-IDF values
+      Collections.sort(summarySentences);
+      // Get the top 5 sentences
+      List<String> top5SummarySentences = summarySentences.subList(summarySentences.size() - 5,
+          summarySentences.size());
+      // Generate the summary
+      StringBuilder summary = new StringBuilder();
+      for (String sentence : top5SummarySentences) {
+        summary.append(sentence);
+        summary.append("\n");
+      }
+      return summary.toString();
 
-      // Example pseudocode (modify as per your specific use case):
-      // List<Double> tfidfValues = new ArrayList<>();
-      // for (DoubleWritable value : values) {
-      // tfidfValues.add(value.get());
-      // }
-      // String summary = generateSummary(tfidfValues); // Implement this method
-      // context.write(key, new Text(summary));
+    }
+
+    public void reduce(Text key, Iterable<Text> values, Context context)
+        throws IOException, InterruptedException {
+
+      List<String> tfidfValues = new ArrayList<>();
+      for (String value : values) {
+        tfidfValues.add(value.get());
+      }
+
+      String summary = generateSummary(tfidfValues);
+      context.write(NullWritable.get(), new Text(summary));
     }
   }
 
