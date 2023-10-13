@@ -86,9 +86,9 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       unigramTreeMap = new TreeMap<DoubleWritable, Text>();
     }
 
-    public String generateSummary(Text Key, List<String> sentences, HashMap<String, Double> tfidfMap) {
+    public String generateSummary(Text key, List<String> sentences, HashMap<String, Double> tfidfMap) {
       List<String> sentenceScores = new ArrayList<>();
-      double sumTFIDF = 0.0;
+      double sumtfidf = 0.0;
 
       for (String sentence : sentences) {
         double sentenceTfidf = 0.0;
@@ -101,7 +101,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         }
 
         sentenceScores.add(sentence + "\t" + sentenceTfidf);
-        sumTfidf += sentenceTfidf;
+        sumtfidf += sentenceTfidf;
       }
       return sentenceScores.toString();
     }
