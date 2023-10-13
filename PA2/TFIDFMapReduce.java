@@ -133,9 +133,9 @@ public class TFIDFMapReduce extends Configured implements Tool {
   // }
 
   public int run(String[] args) throws Exception {
-    Configuration conf = new Configuration();
+    Configuration conf1 = new Configuration();
     // job1
-    Job job1 = Job.getInstance(conf, "Job1");
+    Job job1 = Job.getInstance(conf1, "Job1");
     FileInputFormat.addInputPath(job1, new Path(args[0]));
     FileOutputFormat.setOutputPath(job1, new Path(args[1]));
     job1.setJarByClass(TFIDFMapReduce.class);
@@ -144,8 +144,9 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job1.setOutputKeyClass(Text.class);
     job1.setOutputValueClass(IntWritable.class);
 
+    Configuration conf2 = new Configuration();
     // job2
-    Job job2 = Job.getInstance(conf, "Job2");
+    Job job2 = Job.getInstance(conf2, "Job2");
     FileInputFormat.addInputPath(job2, new Path(args[1]));
     FileOutputFormat.setOutputPath(job2, new Path(args[2]));
     job2.setJarByClass(TFIDFMapReduce.class);
@@ -155,6 +156,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job2.setOutputValueClass(Text.class);
 
     Job job3 = Job.getInstance(conf, "Job3");
+
     JobControl jobControl = new JobControl("TFIDFJob");
     ControlledJob controlledJob1 = new ControlledJob(job1.getConfiguration());
     ControlledJob controlledJob2 = new ControlledJob(job2.getConfiguration());
