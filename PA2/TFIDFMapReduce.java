@@ -17,6 +17,9 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.util.Tool;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class TFIDFMapReduce extends Configured implements Tool {
   // Job1: Extract docID and article body
   public static class Job1Mapper extends Mapper<Object, Text, Text, IntWritable> {
