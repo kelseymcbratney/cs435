@@ -166,7 +166,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
     // Add the controlled jobs to the JobControl
     jobControl.addJob(controlledJob1);
-    // jobControl.addJob(controlledJob2);
+    jobControl.addJob(controlledJob2);
     // jobControl.addJob(controlledJob3);
 
     // Start the JobControl thread
