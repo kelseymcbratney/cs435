@@ -64,7 +64,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         String text = line.substring(docIDMatcher.end()).replaceAll("[^A-Za-z0-9 .]", "").toLowerCase();
 
         // Split the text into unigrams
-        String[] sentences = text.split(". ");
+        String[] sentences = text.split("");
 
         for (String sentence : sentences) {
           if (!sentence.isEmpty()) {
@@ -132,7 +132,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         String[] valueSplit = value.toString().split("\t");
         if (valueSplit[0].startsWith("A")) {
           hashMap.put(key + "\t" + valueSplit[1].toString(),
-              Double.parseDouble(valueSplit[2].toString()));
+              Double.parseDouble(valueSplit[2].toString())); // docID, (Unigram TFIDF)
         } else if (valueSplit[0].startsWith("B")) {
 
           sentences.add(valueSplit[1].toString());
@@ -141,7 +141,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       }
 
       String summary = generateSummary(sentences);
-      context.write(NullWritable.get(), new Text(hashMap.toString()));
+      context.write(NullWritable.get(), new Text(sentences.toString()));
     }
   }
 
