@@ -130,7 +130,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
         docID.set(values[0]);
         unigram.set(values[1]);
         termFrequency.set(values[2]);
-        context.write(docID, new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
+        context.write(new Text(docID), new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
       }
     }
   }
