@@ -168,6 +168,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
       Thread.sleep(1000);
     }
     System.exit(jobControl.getFailedJobList().size());
+    return 0;
   }
 
   public static void main(String[] args) throws Exception {
