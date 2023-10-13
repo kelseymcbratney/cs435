@@ -68,38 +68,36 @@ public class TFIDFMapReduce extends Configured implements Tool {
   }
 
   // Job2: Calculate TF values
-  public static class Job2Mapper extends Mapper<Object, Text, Text, Text> {
+  public static class Job2Mapper extends Mapper<Object, Text, Text, IntWritable> {
     private Text docID = new Text();
-    private Text termFrequency = new Text();
+    private IntWritable termFrequency = new IntWritable();
 
-    public void map(Text key, Text value, Context context) throws IOException,
+    public void map(Object key, Text value, Context context) throws IOException,
         InterruptedException {
       String[] values = value.toString().split("\t");
       docID.set(values[0]);
-      termFrequency.set(values[1] + "\t" + values[2]);
+      termFrequency.set(Integer.parseInt(values[1]));
       context.write(docID, termFrequency);
     }
   }
 
-  public static class Job2Reducer extends Reducer<Text, Text, Text, Text> {
-    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+  public static class Job2Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+        throws IOException, InterruptedException {
 
       // Calculate max frequency for the article
-      double maxFrequency = 0;
-      for (Text value : values) {
-        double tf = Double.parseDouble(value.toString().split("\t")[1]);
+      int maxFrequency = 0;
+      for (IntWritable value : values) {
+        int tf = value.get();
         if (tf > maxFrequency) {
           maxFrequency = tf;
         }
       }
 
       // Calculate and output TF values
-      for (Text value : values) {
-        double tf = Double.parseDouble(value.toString().split("\t")[1]);
-        String unigram = value.toString().split("\t")[0];
-
-        double tfValue = 0.5 + (0.5 * (tf / maxFrequency));
-        context.write(key, new Text(unigram + "\t" + Double.toString(tfValue)));
+      for (IntWritable value : values) {
+        int tf = value.get();
+        context.write(key, new IntWritable(tf)); // This emits the unigram and its term frequency as an IntWritable
       }
     }
   }
