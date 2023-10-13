@@ -40,10 +40,10 @@ public class TFIDFMapReduce extends Configured implements Tool {
         String docIDString = docIDMatcher.group(1).trim();
         docID.set(docIDString);
 
-        // Extract and clean the text
+        // Extract and clean text
         String text = line.substring(docIDMatcher.end()).replaceAll("[^A-Za-z0-9 ]", "").toLowerCase();
 
-        // Split the text into unigrams (words)
+        // Split the text into unigrams
         String[] words = text.split(" ");
 
         for (String word : words) {
@@ -138,11 +138,11 @@ public class TFIDFMapReduce extends Configured implements Tool {
   public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
     private long articleCount = 0;
 
-    protected void setup(Context context) throws IOException,
-        InterruptedException {
-      // Fetch the total number of documents from a Counter (set in a previous job)
-      articleCount = context.getConfiguration().getLong("total_documents", 0);
-    }
+    // protected void setup(Context context) throws IOException,
+    // InterruptedException {
+    // // Fetch the total number of total_documents
+    // articleCount = context.getConfiguration().getLong("total_documents", 0);
+    // }
 
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       int unigramCount = 0;
