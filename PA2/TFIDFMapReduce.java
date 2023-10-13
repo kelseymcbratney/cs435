@@ -53,8 +53,12 @@ public class TFIDFMapReduce extends Configured implements Tool {
       for (IntWritable value : values) {
         sum += value.get();
       }
-      unigramCount.set(sum);
-      context.write(key, unigramCount);
+      // Split the key into document ID and unigram
+      String[] parts = key.toString().split("\t");
+      if (parts.length == 2) {
+        // Output the document ID and unigram with the count
+        context.write(new Text(parts[0] + "\t" + parts[1]), unigramCount);
+      }
     }
   }
 
