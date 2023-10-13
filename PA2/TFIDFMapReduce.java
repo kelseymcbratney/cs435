@@ -145,7 +145,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
   public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-      long articleCount = context.getConfiguration().getLong(Counters.TOTAL_RECORDS.name(), 0);
+      long articleCount = context.getConfiguration().getLong("total_records", 0L);
       int unigramCount = 0;
       List<String> tfList = new ArrayList<String>();
 
@@ -178,7 +178,6 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job1.setReducerClass(Job1Reducer.class);
     job1.setOutputKeyClass(Text.class);
     job1.setOutputValueClass(IntWritable.class);
-
     job1.waitForCompletion(true);
     Counter counter = job1.getCounters().findCounter(Counters.TOTAL_RECORDS);
 
@@ -191,20 +190,18 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job2.setReducerClass(Job2Reducer.class);
     job2.setOutputKeyClass(Text.class);
     job2.setOutputValueClass(Text.class);
-
     job2.waitForCompletion(true);
 
     // job3
     Job job3 = Job.getInstance(conf, "Job3");
-    job3.getConfiguration().setLong(counter.getDisplayName(), counter.getValue());
     FileInputFormat.addInputPath(job3, new Path(args[2]));
     FileOutputFormat.setOutputPath(job3, new Path(args[3]));
+    job3.getConfiguration().set("total_records", Long.toString(counter.getValue()));
     job3.setJarByClass(TFIDFMapReduce.class);
     job3.setMapperClass(Job3Mapper.class);
     job3.setReducerClass(Job3Reducer.class);
     job3.setOutputKeyClass(Text.class);
     job3.setOutputValueClass(Text.class);
-
     return (job3.waitForCompletion(true) ? 0 : 1);
   }
 
