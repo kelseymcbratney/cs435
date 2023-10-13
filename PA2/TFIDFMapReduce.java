@@ -93,7 +93,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
       // Calculate max frequency for the article
       int maxFrequency = 0;
-      List<String> tfList = new List<String>();
+      List<String> tfList = new ArrayList<String>();
 
       for (Text value : values) {
         tfList.add(value.toString());
@@ -146,7 +146,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       int unigramCount = 0;
-      List<String> tfList = new List<String>();
+      List<String> tfList = new ArrayList<String>();
 
       for (Text value : values) {
         tfList.add(value.toString());
