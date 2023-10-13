@@ -19,25 +19,36 @@ import org.apache.hadoop.util.Tool;
 
 public class TFIDFMapReduce extends Configured implements Tool {
   // Job1: Extract docID and article body
-  public static class Job1Mapper extends Mapper<Object, Text, Text, IntWritable> {
-    private Text unigramKey = new Text();
-    private IntWritable defaultOne = new IntWritable(1);
+  public static class Job1Mapper extends Mapper<Object, Text, Text, Text> {
+    private Text docID = new Text();
+    private Text unigram = new Text();
+    private static final IntWritable defaultOne = new IntWritable(1);
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-      // Parse input line and extract docID and article body
       String line = value.toString();
-      int delimIndex = line.indexOf("<====>");
-      if (delimIndex >= 0) {
-        String docID = line.substring(0, delimIndex).trim();
-        String body = line.substring(delimIndex + 8).trim();
+      int docIDStart = line.indexOf("<====>");
 
-        // Remove non-alphanumeric characters and split into unigrams
-        String[] words = body.split("[^A-Za-z0-9]+");
-        for (String word : words) {
-          if (!word.isEmpty()) {
-            // Emit key-value pair as "documentID\tunigram"
-            unigramKey.set(docID + '\t' + word.toLowerCase());
-            context.write(unigramKey, defaultOne); // docID, Unigram, Count
+      if (docIDStart >= 0) {
+        docIDStart += 8; // Move past the "<====>"
+        int docIDEnd = line.indexOf("<====>", docIDStart);
+
+        if (docIDEnd >= 0) {
+          // Extract document ID
+          String docIDString = line.substring(docIDStart, docIDEnd).trim();
+
+          // Extract and clean the text
+          String text = line.substring(docIDEnd + 8).replaceAll("[^A-Za-z0-9 ]", "").toLowerCase();
+
+          // Split the text into unigrams (words)
+          String[] words = text.split(" ");
+
+          // Emit docID, unigram, and count
+          for (String word : words) {
+            if (!word.isEmpty()) {
+              docID.set(docIDString);
+              unigram.set(word + "\t" + defaultOne);
+              context.write(docID, unigram);
+            }
           }
         }
       }
