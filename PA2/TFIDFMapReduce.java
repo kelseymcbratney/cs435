@@ -135,6 +135,8 @@ public class TFIDFMapReduce extends Configured implements Tool {
   public int run(String[] args) throws Exception {
     Configuration conf = new Configuration();
     Job job1 = Job.getInstance(conf, "Job1");
+    FileInputFormat.addInputPath(job1, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job1, new Path(args[1]));
     // Set job1 Mapper, Reducer, InputFormat, and OutputFormat
 
     Job job2 = Job.getInstance(conf, "Job2");
