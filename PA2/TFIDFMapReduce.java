@@ -135,14 +135,14 @@ public class TFIDFMapReduce extends Configured implements Tool {
     }
   }
 
-  public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
+  public static class Job3Reducer extends Reducer<LongWritable, Text, Text, Text> {
     private long articleCount = 0;
 
-    // protected void setup(Context context) throws IOException,
-    // InterruptedException {
-    // // Fetch the total number of total_documents
-    // articleCount = context.getConfiguration().getLong("total_documents", 0);
-    // }
+    protected void setup(Context context) throws IOException,
+        InterruptedException {
+      // Fetch the total number of total_documents
+      articleCount = context.getConfiguration().getLong("total_documents", 0);
+    }
 
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       int unigramCount = 0;
