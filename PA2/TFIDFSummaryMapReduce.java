@@ -125,7 +125,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
     public void reduce(Text key, Iterable<Text> values, Context context)
         throws IOException, InterruptedException {
 
-      List<String> tfidfValues = new ArrayList<>();
+      List<String> sentences = new ArrayList<>();
       HashMap<String, Double> hashMap = new HashMap<String, Double>();
 
       for (Text value : values) {
@@ -134,13 +134,14 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
           hashMap.put(key + "\t" + valueSplit[1].toString(),
               Double.parseDouble(valueSplit[2].toString()));
         } else if (valueSplit[0].startsWith("B")) {
-          tfidfValues.add(valueSplit[1].toString());
+
+          sentences.add(valueSplit[1].toString());
         }
 
       }
 
       String summary = generateSummary(tfidfValues);
-      context.write(NullWritable.get(), new Text(summary));
+      context.write(NullWritable.get(), new Text(sentences.toString()));
     }
   }
 
