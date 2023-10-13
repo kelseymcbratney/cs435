@@ -87,44 +87,22 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
     }
 
     public String generateSummary(List<String> sentences, HashMap<String, Double> tfidfMap) {
-      // Create a list to store sentences with their respective TF-IDF scores
-      List<Pair<String, Double>> sentenceScores = new ArrayList<>();
-
-      // Calculate the sum of TF-IDF scores to normalize the scores later
-      double sumTfidf = 0.0;
+      List<> sentenceScores = new ArrayList<>();
+      double sumTFIDF = 0.0;
 
       for (String sentence : sentences) {
-        // Calculate the TF-IDF score for the sentence
-        double sentenceTfidf = 0.0;
-        String[] words = sentence.split(" "); // Split the sentence into words
-
+        String[] words = sentence.split(" ");
         for (String word : words) {
-          if (tfidfMap.containsKey(word)) {
-            sentenceTfidf += tfidfMap.get(word); // Accumulate TF-IDF values for words in the sentence
+          String docUnigram = key.toString() + "\t" + word;
+          if (tfidfMap.containsKey(docUnigram)) {
+            sentenceTfidf += tfidfMap.get(docUnigram); // Accumulate TF-IDF values for words in the sentence
           }
         }
 
-        sentenceScores.add(new Pair<>(sentence, sentenceTfidf));
+        sentenceScores.add(sentence + "\t" + sentenceTfidf);
         sumTfidf += sentenceTfidf;
       }
-
-      // Normalize the TF-IDF scores
-      for (Pair<String, Double> pair : sentenceScores) {
-        pair.setSecond(pair.getSecond() / sumTfidf);
-      }
-
-      // Sort sentences by normalized TF-IDF scores in descending order
-      sentenceScores.sort((a, b) -> Double.compare(b.getSecond(), a.getSecond()));
-
-      // Choose the top sentences for the summary (you can adjust the number of
-      // sentences)
-      int numSentencesInSummary = 5; // You can adjust this value
-      StringBuilder summary = new StringBuilder();
-      for (int i = 0; i < numSentencesInSummary && i < sentenceScores.size(); i++) {
-        summary.append(sentenceScores.get(i).getFirst()).append(" ");
-      }
-
-      return summary.toString();
+      return sentenceScores.toString();
     }
 
     public void reduce(Text key, Iterable<Text> values, Context context)
