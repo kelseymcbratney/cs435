@@ -64,8 +64,6 @@ public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWrit
     context.write(key, unigramCount);
   }
 
-  }
-
   // // Job2: Calculate TF values
   // public static class Job2Mapper extends Mapper<Text, Text, Text, Text> {
   // private Text docID = new Text();
