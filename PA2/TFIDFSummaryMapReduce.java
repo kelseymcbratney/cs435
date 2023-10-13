@@ -64,7 +64,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         String text = line.substring(docIDMatcher.end()).replaceAll("[^A-Za-z0-9 .]", "").toLowerCase();
 
         // Split the text into unigrams
-        String[] sentences = text.split("");
+        String[] sentences = text.split(" ");
 
         for (String sentence : sentences) {
           if (!sentence.isEmpty()) {
