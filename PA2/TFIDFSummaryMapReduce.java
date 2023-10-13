@@ -104,12 +104,6 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         sumtfidf += sentenceTfidf;
       }
 
-      for (int i = 0; i < sentenceScores.size(); i++) { // Normalize Data
-        String[] parts = sentenceScores.get(i).split("\t");
-        double normalizedTfidf = Double.parseDouble(parts[1]) / sumtfidf;
-        sentenceScores.set(i, parts[0] + "\t" + normalizedTfidf);
-      }
-
       sentenceScores.sort((a, b) -> { // Sort Data
         double scoreA = Double.parseDouble(a.split("\t")[1]);
         double scoreB = Double.parseDouble(b.split("\t")[1]);
