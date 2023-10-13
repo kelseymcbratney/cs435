@@ -78,11 +78,13 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
 
   // Reducer: Generate Summary based on TF-IDF values
   public static class SummaryReducer extends Reducer<Text, Text, NullWritable, Text> {
+    TreeMap<DoubleWritable, Text> unigramTreeMap;
+
     public void setup(Context context) throws IOException, InterruptedException {
       unigramTreeMap = new TreeMap<DoubleWritable, Text>();
     }
 
-    public String generateSummary(List<String> tfidfValues) {
+    public String generateSummary(List<String> tfidfValues, Context context) throws IOException, InterruptedException {
       String foo = "foo";
       return foo;
       // // Sort the TF-IDF values
