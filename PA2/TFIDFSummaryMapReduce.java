@@ -77,33 +77,43 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
 
   // Reducer: Generate Summary based on TF-IDF values
   public static class SummaryReducer extends Reducer<Text, Text, NullWritable, Text> {
-    public string generateSummary(List<String> tfidfValues) {
-      // Sort the TF-IDF values
-      Collections.sort(tfidfValues);
-      // Get the top 5 TF-IDF values
-      List<Double> top5TFIDFValues = tfidfValues.subList(tfidfValues.size() - 5, tfidfValues.size());
-      // Calculate the average of the top 5 TF-IDF values
-      double averageTop5TFIDFValues = top5TFIDFValues.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
-      // Get the sentences that have TF-IDF values greater than the average of the top
-      // 5 TF-IDF values
-      List<String> summarySentences = new ArrayList<>();
-      for (Double tfidfValue : tfidfValues) {
-        if (tfidfValue > averageTop3TFIDFValues) {
-          summarySentences.add(tfidfValue);
-        }
-      }
-      // Sort the sentences by the TF-IDF values
-      Collections.sort(summarySentences);
-      // Get the top 5 sentences
-      List<String> top5SummarySentences = summarySentences.subList(summarySentences.size() - 5,
-          summarySentences.size());
-      // Generate the summary
-      StringBuilder summary = new StringBuilder();
-      for (String sentence : top5SummarySentences) {
-        summary.append(sentence);
-        summary.append("\n");
-      }
-      return summary.toString();
+    public void setup(Context context) throws IOException, InterruptedException {
+      unigramTreeMap = new TreeMap<DoubleWritable, Text>();
+    }
+
+    public String generateSummary(List<String> tfidfValues) {
+      String foo = "foo";
+      return foo;
+      // // Sort the TF-IDF values
+      // Collections.sort(tfidfValues);
+      // // Get the top 5 TF-IDF values
+      // List<Double> top5TFIDFValues = tfidfValues.subList(tfidfValues.size() - 5,
+      // tfidfValues.size());
+      // // Calculate the average of the top 5 TF-IDF values
+      // double averageTop5TFIDFValues =
+      // top5TFIDFValues.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
+      // // Get the sentences that have TF-IDF values greater than the average of the
+      // top
+      // // 5 TF-IDF values
+      // List<String> summarySentences = new ArrayList<>();
+      // for (String tfidfValue : tfidfValues) {
+      // if (tfidfValue > averageTop5TFIDFValues) {
+      // summarySentences.add(tfidfValue);
+      // }
+      // }
+      // // Sort the sentences by the TF-IDF values
+      // Collections.sort(summarySentences);
+      // // Get the top 5 sentences
+      // List<String> top5SummarySentences =
+      // summarySentences.subList(summarySentences.size() - 5,
+      // summarySentences.size());
+      // // Generate the summary
+      // StringBuilder summary = new StringBuilder();
+      // for (String sentence : top5SummarySentences) {
+      // summary.append(sentence);
+      // summary.append("\n");
+      // }
+      // return summary.toString();
 
     }
 
@@ -111,8 +121,14 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         throws IOException, InterruptedException {
 
       List<String> tfidfValues = new ArrayList<>();
-      for (String value : values) {
-        tfidfValues.add(value.get());
+      for (Text value : values) {
+        String[] valueSplit = value.toString().split("\t");
+        if (valueSplit[0].startsWith("A")) {
+          unigramTreeMap.put(key + "\t" + valueSplit[1], new DoubleWritable(Double.parseDouble(valueSplit[2])));
+        } else if (valueSplit[0].startsWith("B")) {
+          tfidfValues.add(valueSplit[1]);
+        }
+
       }
 
       String summary = generateSummary(tfidfValues);
