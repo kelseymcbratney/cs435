@@ -18,8 +18,8 @@ import org.apache.hadoop.io.IntWritable;
 public class TFIDFMapReduce {
   // Job1: Extract docID and article body
   public static class Job1Mapper extends Mapper<Object, Text, Text, Text> {
-    private Text docID = new Text();
-    private Text unigram = new Text();
+    private Text docID;
+    private Text unigram;
     private IntWritable defaultOne = new IntWritable(1);
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -27,14 +27,14 @@ public class TFIDFMapReduce {
       String line = value.toString();
       int delimIndex = line.indexOf("<====>");
       if (delimIndex >= 0) {
-        docID.set(line.substring(0, delimIndex).trim());
+        docID = new Text(line.substring(0, delimIndex).trim());
         String body = line.substring(delimIndex + 8).trim();
 
         // Remove non-alphanumeric characters and split into unigrams
         String[] words = body.split("[^A-Za-z0-9]+");
         for (String word : words) {
           if (!word.isEmpty()) {
-            unigram.set(docID.toString() + '\t' + word.toLowerCase());
+            unigram = new Text(docID.toString() + '\t' + word.toLowerCase());
             context.write(unigram, defaultOne); // docID, Unigram, Count
           }
         }
@@ -51,8 +51,7 @@ public class TFIDFMapReduce {
       for (IntWritable value : values) {
         sum += value.get();
       }
-      unigramCount.set(sum);
-      context.write(key, unigramCount);
+      context.write(key, new Text(Integer.toString(sum)));
     }
   }
 
