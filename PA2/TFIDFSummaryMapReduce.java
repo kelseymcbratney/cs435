@@ -86,11 +86,12 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       unigramTreeMap = new TreeMap<DoubleWritable, Text>();
     }
 
-    public String generateSummary(List<String> sentences, HashMap<String, Double> tfidfMap) {
+    public String generateSummary(Text Key, List<String> sentences, HashMap<String, Double> tfidfMap) {
       List<String> sentenceScores = new ArrayList<>();
       double sumTFIDF = 0.0;
 
       for (String sentence : sentences) {
+        double sentenceTfidf = 0.0;
         String[] words = sentence.split(" ");
         for (String word : words) {
           String docUnigram = key.toString() + "\t" + word;
@@ -122,7 +123,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
 
       }
 
-      String summary = generateSummary(sentences, hashMap);
+      String summary = generateSummary(key, sentences, hashMap);
       context.write(NullWritable.get(), new Text(summary));
     }
   }
