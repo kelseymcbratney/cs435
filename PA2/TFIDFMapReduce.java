@@ -126,43 +126,44 @@ public class TFIDFMapReduce extends Configured implements Tool {
     public void map(Text key, Text value, Context context) throws IOException,
         InterruptedException {
       String[] values = value.toString().split("\t");
-      if (values.length >= 3) {
-        docID.set(values[0]);
-        unigram.set(values[1]);
-        termFrequency.set(values[2]);
-        context.write(docID, new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
-      }
+      // if (values.length >= 3) {
+      // docID.set(values[0]);
+      // unigram.set(values[1]);
+      // termFrequency.set(values[2]);
+      // context.write(docID, new Text(unigram + "\t" + termFrequency)); // DocID ,
+      // (Unigram termFrequency)
     }
   }
+}
 
-  public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
-    private long articleCount = 0;
+public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
+  private long articleCount = 0;
 
-    protected void setup(Context context) throws IOException,
-        InterruptedException {
-      // Fetch the total number of total_documents
-      articleCount = context.getConfiguration().getLong("total_documents", 0);
-    }
+  protected void setup(Context context) throws IOException,
+      InterruptedException {
+    // Fetch the total number of total_documents
+    articleCount = context.getConfiguration().getLong("total_documents", 0);
+  }
 
-    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-      int unigramCount = 0;
-      List<String> tfList = new ArrayList<String>();
+  public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+    int unigramCount = 0;
+    List<String> tfList = new ArrayList<String>();
 
-      for (Text value : values) {
-        tfList.add(value.toString());
-        unigramCount += 1;
-      }
-
-      for (String value : tfList) {
-        String[] tfValues = value.toString().split("\t");
-        String unigram = tfValues[0];
-        double tf = Double.parseDouble(tfValues[1]);
-        double idf = Math.log10(articleCount / unigramCount);
-        double tfidf = tf * idf;
-        context.write(key, new Text(unigram + "\t" + tfidf)); // DocID , (Unigram TF-IDF)
-      }
-
-    }
+    // for (Text value : values) {
+    // tfList.add(value.toString());
+    // unigramCount += 1;
+    // }
+    //
+    // for (String value : tfList) {
+    // String[] tfValues = value.toString().split("\t");
+    // String unigram = tfValues[0];
+    // double tf = Double.parseDouble(tfValues[1]);
+    // double idf = Math.log10(articleCount / unigramCount);
+    // double tfidf = tf * idf;
+    // context.write(key, new Text(unigram + "\t" + tfidf)); // DocID , (Unigram
+    // TF-IDF)
+    // }
+    // }
 
   }
 
@@ -210,7 +211,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     // Add the controlled jobs to the JobControl
     jobControl.addJob(controlledJob1);
     jobControl.addJob(controlledJob2);
-    // jobControl.addJob(controlledJob3);
+    jobControl.addJob(controlledJob3);
 
     // Start the JobControl thread
     Thread jobControlThread = new Thread(jobControl);
