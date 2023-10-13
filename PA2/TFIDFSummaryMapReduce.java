@@ -124,10 +124,12 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         throws IOException, InterruptedException {
 
       List<String> tfidfValues = new ArrayList<>();
+      HashMap<String, Double> hashMap = new HashMap<String, Double>();
+
       for (Text value : values) {
         String[] valueSplit = value.toString().split("\t");
         if (valueSplit[0].startsWith("A")) {
-          unigramTreeMap.put(key + "\t" + valueSplit[1].toString(),
+          hashMap.put(key + "\t" + valueSplit[1].toString(),
               new DoubleWritable(Double.parseDouble(valueSplit[2].toString())));
         } else if (valueSplit[0].startsWith("B")) {
           tfidfValues.add(valueSplit[1].toString());
