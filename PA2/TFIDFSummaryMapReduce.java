@@ -127,7 +127,8 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       for (Text value : values) {
         String[] valueSplit = value.toString().split("\t");
         if (valueSplit[0].startsWith("A")) {
-          unigramTreeMap.put(key + "\t" + valueSplit[1], new DoubleWritable(Double.parseDouble(valueSplit[2])));
+          unigramTreeMap.put(key + "\t" + valueSplit[1].toString()
+              new DoubleWritable(Double.parseDouble(valueSplit[2].toString())));
         } else if (valueSplit[0].startsWith("B")) {
           tfidfValues.add(valueSplit[1].toString());
         }
