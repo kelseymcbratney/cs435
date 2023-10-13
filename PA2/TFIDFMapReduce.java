@@ -20,6 +20,9 @@ import org.apache.hadoop.util.Tool;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class TFIDFMapReduce extends Configured implements Tool {
   // Job1: Extract docID and article body
   public static class Job1Mapper extends Mapper<Object, Text, Text, IntWritable> {
@@ -80,7 +83,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
         docID.set(values[0]);
         unigram.set(values[1]);
         termFrequency.set(values[2]);
-        context.write(docID, unigram + "\t " + termFrequency); // DocID , (Unigram Frequency)
+        context.write(docID, new Text(unigram + "\t " + termFrequency)); // DocID , (Unigram Frequency)
       }
     }
   }
