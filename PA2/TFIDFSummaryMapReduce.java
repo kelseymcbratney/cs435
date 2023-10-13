@@ -87,7 +87,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
     }
 
     public String generateSummary(List<String> sentences, HashMap<String, Double> tfidfMap) {
-      List<> sentenceScores = new ArrayList<>();
+      List<String> sentenceScores = new ArrayList<>();
       double sumTFIDF = 0.0;
 
       for (String sentence : sentences) {
