@@ -46,7 +46,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
         for (String word : words) {
           if (!word.isEmpty()) {
             unigram.set(docID + "\t" + word);
-            context.write(unigram, defaultOne);
+            context.write(unigram, defaultOne); // DocID , (Unigram 1)
           }
         }
       }
@@ -63,43 +63,52 @@ public class TFIDFMapReduce extends Configured implements Tool {
         sum += value.get();
       }
       unigramCount.set(sum);
-      context.write(key, unigramCount);
+      context.write(key, unigramCount); // DocID , (Unigram Frequency)
     }
   }
 
   // Job2: Calculate TF values
-  public static class Job2Mapper extends Mapper<Object, Text, Text, IntWritable> {
+  public static class Job2Mapper extends Mapper<Object, Text, Text, Text> {
     private Text docID = new Text();
-    private IntWritable termFrequency = new IntWritable();
+    private Text termFrequency = new Text();
+    private Text unigram = new Text();
+    private Text tf = new Text();
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
       String[] values = value.toString().split("\t");
       if (values.length >= 3) {
         docID.set(values[0]);
-        int tf = Integer.parseInt(values[2]); // Extract TF from the third column
-        termFrequency.set(tf);
-        context.write(docID, termFrequency);
+        unigram = values[1];
+        termFrequency.set(values[2]);
+        context.write(docID, unigram + "\t " + termFrequency); // DocID , (Unigram Frequency)
       }
     }
   }
 
-  public static class Job2Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+  public static class Job2Reducer extends Reducer<Text, Text, Text, Text> {
+    public void reduce(Text key, Iterable<Text> values, Context context)
         throws IOException, InterruptedException {
 
       // Calculate max frequency for the article
       int maxFrequency = 0;
-      for (IntWritable value : values) {
-        int tf = value.get();
+      List<String> tfList = new ArrayList<String>();
+
+      for (Text value : values) {
+        tfList.add(value.toString());
+        double tf = Double.parseDouble(value.toString()).split("\t")[1];
+
         if (tf > maxFrequency) {
           maxFrequency = tf;
         }
       }
 
       // Calculate and output TF values
-      for (IntWritable value : values) {
-        int tf = value.get();
-        context.write(key, new IntWritable(tf)); // This emits the unigram and its term frequency as an IntWritable
+      for (String value : tfList) {
+        String[] tfValues = value.toString().split("\t");
+        String unigram = tfValues[0];
+        double tf = Double.parseDouble(tfValues[1]);
+        tf = 0.5 + (0.5 * (tf / maxFrequency));
+        context.write(key, new Text(unigram + "\t" + tf));
       }
     }
   }
@@ -153,7 +162,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job2.setMapperClass(Job2Mapper.class);
     job2.setReducerClass(Job2Reducer.class);
     job2.setOutputKeyClass(Text.class);
-    job2.setOutputValueClass(IntWritable.class);
+    job2.setOutputValueClass(Text.class);
 
     Job job3 = Job.getInstance(conf, "Job3");
 
