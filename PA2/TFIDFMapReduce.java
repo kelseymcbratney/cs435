@@ -12,14 +12,13 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.util.GenericOptionsParser;
-import org.w3c.dom.Text;
 import org.apache.hadoop.io.IntWritable;
 
-public class TFIDFMapReduce {
+public class TFIDFMapReduce extends Configured implements Tool {
   // Job1: Extract docID and article body
   public static class Job1Mapper extends Mapper<Object, Text, Text, Text> {
-    private Text docID;
-    private Text unigram;
+    private Text docID = new Text();
+    private Text unigram = new Text();
     private IntWritable defaultOne = new IntWritable(1);
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -27,14 +26,14 @@ public class TFIDFMapReduce {
       String line = value.toString();
       int delimIndex = line.indexOf("<====>");
       if (delimIndex >= 0) {
-        docID = new Text(line.substring(0, delimIndex).trim());
+        docID.set(line.substring(0, delimIndex).trim());
         String body = line.substring(delimIndex + 8).trim();
 
         // Remove non-alphanumeric characters and split into unigrams
         String[] words = body.split("[^A-Za-z0-9]+");
         for (String word : words) {
           if (!word.isEmpty()) {
-            unigram = new Text(docID.toString() + '\t' + word.toLowerCase());
+            unigram.set(docID.toString() + '\t' + word.toLowerCase());
             context.write(unigram, defaultOne); // docID, Unigram, Count
           }
         }
@@ -51,7 +50,8 @@ public class TFIDFMapReduce {
       for (IntWritable value : values) {
         sum += value.get();
       }
-      context.write(key, new Text(Integer.toString(sum)));
+      unigramCount.set(sum);
+      context.write(key, unigramCount);
     }
   }
 
