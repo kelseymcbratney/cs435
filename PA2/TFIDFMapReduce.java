@@ -133,7 +133,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
   // }
 
   public int run(String[] args) throws Exception {
-    Configuration conf1 = new Configuration();
+    Configuration conf = new Configuration();
     // job1
     Job job1 = Job.getInstance(conf, "Job1");
     FileInputFormat.addInputPath(job1, new Path(args[0]));
