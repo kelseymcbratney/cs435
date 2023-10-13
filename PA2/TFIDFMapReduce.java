@@ -180,6 +180,9 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job1.setOutputKeyClass(Text.class);
     job1.setOutputValueClass(IntWritable.class);
 
+    job1.waitForCompletion(true);
+    Counter counter = job1.getCounters().findCounter(Counters.TOTAL_RECORDS);
+
     // job2
     Job job2 = Job.getInstance(conf, "Job2");
     FileInputFormat.addInputPath(job2, new Path(args[1]));
@@ -189,6 +192,8 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job2.setReducerClass(Job2Reducer.class);
     job2.setOutputKeyClass(Text.class);
     job2.setOutputValueClass(Text.class);
+
+    job2.waitForCompletion(true);
 
     // job3
     Job job3 = Job.getInstance(conf, "Job3");
@@ -201,30 +206,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job3.setOutputKeyClass(Text.class);
     job3.setOutputValueClass(Text.class);
 
-    JobControl jobControl = new JobControl("TFIDFJob");
-    ControlledJob controlledJob1 = new ControlledJob(job1.getConfiguration());
-    ControlledJob controlledJob2 = new ControlledJob(job2.getConfiguration());
-    ControlledJob controlledJob3 = new ControlledJob(job3.getConfiguration());
-
-    // Add dependencies between jobs
-    controlledJob2.addDependingJob(controlledJob1);
-    controlledJob3.addDependingJob(controlledJob2);
-
-    // Add the controlled jobs to the JobControl
-    jobControl.addJob(controlledJob1);
-    jobControl.addJob(controlledJob2);
-    jobControl.addJob(controlledJob3);
-
-    // Start the JobControl thread
-    Thread jobControlThread = new Thread(jobControl);
-    jobControlThread.start();
-
-    // Wait for the JobControl thread to finish
-    while (!jobControl.allFinished()) {
-      Thread.sleep(1000);
-    }
-    System.exit(jobControl.getFailedJobList().size());
-    return 0;
+    return (job3.waitForCompletion(true) ? 0 : 1);
   }
 
   public static void main(String[] args) throws Exception {
