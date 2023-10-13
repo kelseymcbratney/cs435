@@ -171,7 +171,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
   }
 
   public static void main(String[] args) throws Exception {
-    int res = ToolRunner.run(new Configuration(), new Job1Reducer(), args);
+    int res = ToolRunner.run(new Configuration(), new TFIDFMapReduce(), args);
     System.exit(res);
   }
 }
