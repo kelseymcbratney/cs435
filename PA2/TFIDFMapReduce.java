@@ -49,19 +49,19 @@ public class TFIDFMapReduce extends Configured implements Tool {
       }
     }
   }
-}
 
-public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-  private IntWritable unigramCount = new IntWritable();
+  public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    private IntWritable unigramCount = new IntWritable();
 
-  public void reduce(Text key, Iterable<IntWritable> values, Context context)
-      throws IOException, InterruptedException {
-    int sum = 0;
-    for (IntWritable value : values) {
-      sum += value.get();
+    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+        throws IOException, InterruptedException {
+      int sum = 0;
+      for (IntWritable value : values) {
+        sum += value.get();
+      }
+      unigramCount.set(sum);
+      context.write(key, unigramCount);
     }
-    unigramCount.set(sum);
-    context.write(key, unigramCount);
   }
 
   // // Job2: Calculate TF values
