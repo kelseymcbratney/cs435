@@ -110,18 +110,22 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         sentenceScores.set(i, parts[0] + "\t" + normalizedTfidf);
       }
 
-      sentenceScores.sort((a, b) -> {
+      sentenceScores.sort((a, b) -> { // Sort Data
         double scoreA = Double.parseDouble(a.split("\t")[1]);
         double scoreB = Double.parseDouble(b.split("\t")[1]);
         return Double.compare(scoreB, scoreA);
       });
 
-      int numSentencesInSummary = 5; // You can adjust this value
+      int numSentencesInSummary = 5;
       StringBuilder summary = new StringBuilder();
       for (int i = 0; i < numSentencesInSummary && i < sentenceScores.size(); i++) {
-        summary.append(sentenceScores.get(i).split("\t")[0]).append(" ");
+        summary.append(sentenceScores.get(i).split("\t")[0]);
+        if (i < numSentencesInSummary - 1 && i < sentenceScores.size() - 1) {
+          summary.append(". ");
+        } else {
+          summary.append(" ");
+        }
       }
-
       return summary.toString();
     }
 
