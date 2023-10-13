@@ -32,10 +32,10 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
       String[] tfValues = value.toString().split("\t");
-      if (values.length >= 3) {
-        docID.set(values[0]);
-        unigram.set(values[1]);
-        termFrequency.set(values[2]);
+      if (tfValues.length >= 3) {
+        docID.set(tfValues[0]);
+        unigram.set(tfValues[1]);
+        termFrequency.set(tfValues[2]);
         context.write(new Text(docID), new Text("A" + "\t" + unigram + "\t" + termFrequency)); // DocID , (Unigram
                                                                                                // termFrequency)
       }
