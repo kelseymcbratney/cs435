@@ -117,13 +117,13 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
   // Job3: Calculate IDF and TF-IDF values
 
-  public static class Job3Mapper extends Mapper<Object, Text, Text, Text> {
+  public static class Job3Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
     private Text docID = new Text();
     private Text termFrequency = new Text();
     private Text unigram = new Text();
 
-    public void map(Text key, Text value, Context context) throws IOException,
+    public void map(LongWritable key, Text value, Context context) throws IOException,
         InterruptedException {
       String[] values = value.toString().split("\t");
       if (values.length >= 3) {
