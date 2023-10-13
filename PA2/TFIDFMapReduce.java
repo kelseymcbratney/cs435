@@ -78,7 +78,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
       String[] values = value.toString().split("\t");
       if (values.length >= 3) {
         docID.set(values[0]);
-        unigram = values[1];
+        unigram.set(values[1]);
         termFrequency.set(values[2]);
         context.write(docID, unigram + "\t " + termFrequency); // DocID , (Unigram Frequency)
       }
@@ -95,7 +95,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
       for (Text value : values) {
         tfList.add(value.toString());
-        double tf = Double.parseDouble(value.toString()).split("\t")[1];
+        int tf = Integer.parseInt(value.toString().split("\t")[1]);
 
         if (tf > maxFrequency) {
           maxFrequency = tf;
