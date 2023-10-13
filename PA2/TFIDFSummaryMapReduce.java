@@ -84,7 +84,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       unigramTreeMap = new TreeMap<DoubleWritable, Text>();
     }
 
-    public String generateSummary(List<String> tfidfValues, Context context) throws IOException, InterruptedException {
+    public String generateSummary(List<String> tfidfValues) throws IOException, InterruptedException {
       String foo = "foo";
       return foo;
       // // Sort the TF-IDF values
