@@ -96,10 +96,10 @@ public class TFIDFMapReduce extends Configured implements Tool {
       // Calculate and output TF values
       for (Text value : values) {
         double tf = Double.parseDouble(value.toString().split("\t")[1]);
-        String unigram = value.string().split("\t")[0];
+        String unigram = value.toString().split("\t")[0];
 
         double tfValue = 0.5 + (0.5 * (tf / maxFrequency));
-        context.write(key, new Text(Double.toString(unigram + "\t" + tfValue)));
+        context.write(key, new Text(unigram + "\t" + Double.toString(tfValue)));
       }
     }
   }
