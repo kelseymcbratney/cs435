@@ -110,7 +110,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
         String unigram = tfValues[0];
         double tf = Double.parseDouble(tfValues[1]);
         tf = 0.5 + (0.5 * (tf / maxFrequency));
-        context.write(key, new Text(unigram + "\t" + tf)); // DocID , (Unigram termFrequency)
+        context.write(new Text(key), new Text(unigram + "\t" + tf)); // DocID , (Unigram termFrequency)
       }
     }
   }
@@ -130,7 +130,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
         docID.set(values[0]);
         unigram.set(values[1]);
         termFrequency.set(values[2]);
-        context.write(docID, new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
+        context.write(new Text(docID), new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
       }
     }
   }
