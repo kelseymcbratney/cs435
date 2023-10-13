@@ -96,14 +96,33 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         for (String word : words) {
           String docUnigram = key.toString() + "\t" + word;
           if (tfidfMap.containsKey(docUnigram)) {
-            sentenceTfidf += tfidfMap.get(docUnigram); // Accumulate TF-IDF values for words in the sentence
+            sentenceTfidf += tfidfMap.get(docUnigram); // Accumulate TF-IDF values for sentence
           }
         }
 
         sentenceScores.add(sentence + "\t" + sentenceTfidf);
         sumtfidf += sentenceTfidf;
       }
-      return sentenceScores.toString();
+
+      for (int i = 0; i < sentenceScores.size(); i++) {
+        String[] parts = sentenceScores.get(i).split("\t");
+        double normalizedTfidf = Double.parseDouble(parts[1]) / sumTfidf;
+        sentenceScores.set(i, parts[0] + "\t" + normalizedTfidf);
+      }
+
+      sentenceScores.sort((a, b) -> {
+        double scoreA = Double.parseDouble(a.split("\t")[1]);
+        double scoreB = Double.parseDouble(b.split("\t")[1]);
+        return Double.compare(scoreB, scoreA);
+      });
+
+      int numSentencesInSummary = 5; // You can adjust this value
+      StringBuilder summary = new StringBuilder();
+      for (int i = 0; i < numSentencesInSummary && i < sentenceScores.size(); i++) {
+        summary.append(sentenceScores.get(i).split("\t")[0]).append(" ");
+      }
+
+      return summary.toString();
     }
 
     public void reduce(Text key, Iterable<Text> values, Context context)
