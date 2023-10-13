@@ -19,7 +19,7 @@ import org.apache.hadoop.util.Tool;
 
 public class TFIDFMapReduce extends Configured implements Tool {
   // Job1: Extract docID and article body
-  public static class Job1Mapper extends Mapper<Object, Text, Text, Text> {
+  public static class Job1Mapper extends Mapper<Object, Text, Text, IntWritable> {
     private Text docID = new Text();
     private Text unigram = new Text();
     private static final IntWritable defaultOne = new IntWritable(1);
