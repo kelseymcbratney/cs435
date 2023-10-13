@@ -113,7 +113,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       }
 
       String summary = generateSummary(sentences, hashMap);
-      context.write(NullWritable.get(), new Text(hashMap.toString()));
+      context.write(NullWritable.get(), new Text(sentences.toString()));
     }
   }
 
