@@ -19,7 +19,7 @@ import org.apache.hadoop.util.Tool;
 
 public class TFIDFMapReduce extends Configured implements Tool {
   // Job1: Extract docID and article body
-  public static class Job1Mapper extends Mapper<Object, Text, Text, Text> {
+  public static class Job1Mapper extends Mapper<Object, Text, Text, IntWritable> {
     private Text docID = new Text();
     private Text unigram = new Text();
     private IntWritable defaultOne = new IntWritable(1);
@@ -44,7 +44,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     }
   }
 
-  public static class Job1Reducer extends Reducer<Text, Text, Text, Text> {
+  public static class Job1Reducer extends Reducer<IntWritable, Text, Text, IntWritable> {
     private IntWritable unigramCount = new IntWritable();
 
     public void reduce(Text key, Iterable<IntWritable> values, Context context)
@@ -171,7 +171,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
   }
 
   public static void main(String[] args) throws Exception {
-    int res = ToolRunner.run(new Configuration(), new Job(), args);
+    int res = ToolRunner.run(new Configuration(), new JobTFIDF(), args);
     System.exit(res);
   }
 }
