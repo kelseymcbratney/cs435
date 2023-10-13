@@ -130,7 +130,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
         docID.set(values[0]);
         unigram.set(values[1]);
         termFrequency.set(values[2]);
-        context.write(new Text(docID), new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
+        context.write(docID, new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
       }
     }
   }
@@ -210,7 +210,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     // Add the controlled jobs to the JobControl
     jobControl.addJob(controlledJob1);
     jobControl.addJob(controlledJob2);
-    jobControl.addJob(controlledJob3);
+    // jobControl.addJob(controlledJob3);
 
     // Start the JobControl thread
     Thread jobControlThread = new Thread(jobControl);
