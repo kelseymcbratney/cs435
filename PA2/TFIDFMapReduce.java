@@ -44,7 +44,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     }
   }
 
-  public static class Job1Reducer extends Reducer<IntWritable, Text, Text, IntWritable> {
+  public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
     private IntWritable unigramCount = new IntWritable();
 
     public void reduce(Text key, Iterable<IntWritable> values, Context context)
