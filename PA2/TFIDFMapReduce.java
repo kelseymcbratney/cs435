@@ -23,50 +23,47 @@ public class TFIDFMapReduce extends Configured implements Tool {
     private Text docID = new Text();
     private Text unigram = new Text();
     private static final IntWritable defaultOne = new IntWritable(1);
+    private static final Pattern docIDPattern = Pattern.compile("<====>(\\d+)<====>");
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
       String line = value.toString();
-      int docIDStart = line.indexOf("<====>");
 
-      if (docIDStart >= 0) {
-        docIDStart += 8; // Move past the "<====>"
-        int docIDEnd = line.indexOf("<====>", docIDStart);
+      Matcher docIDMatcher = docIDPattern.matcher(line);
+      if (docIDMatcher.find()) {
+        // Extract document ID
+        String docIDString = docIDMatcher.group(1).trim();
+        docID.set(docIDString);
 
-        if (docIDEnd >= 0) {
-          // Extract document ID
-          String docIDString = line.substring(docIDStart, docIDEnd).trim();
+        // Extract and clean the text
+        String text = line.substring(docIDMatcher.end()).replaceAll("[^A-Za-z0-9 ]", "").toLowerCase();
 
-          // Extract and clean the text
-          String text = line.substring(docIDEnd + 8).replaceAll("[^A-Za-z0-9 ]", "").toLowerCase();
+        // Split the text into unigrams (words)
+        String[] words = text.split(" ");
 
-          // Split the text into unigrams (words)
-          String[] words = text.split(" ");
-
-          // Emit docID, unigram, and count
-          for (String word : words) {
-            if (!word.isEmpty()) {
-              docID.set(docIDString);
-              unigram.set(docID + "\t" + word);
-              context.write(unigram, defaultOne);
-            }
+        for (String word : words) {
+          if (!word.isEmpty()) {
+            unigram.set(docID + "\t" + word);
+            context.write(unigram, defaultOne);
           }
         }
       }
     }
   }
+}
 
-  public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-    private IntWritable unigramCount = new IntWritable();
+public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+  private IntWritable unigramCount = new IntWritable();
 
-    public void reduce(Text key, Iterable<IntWritable> values, Context context)
-        throws IOException, InterruptedException {
-      int sum = 0;
-      for (IntWritable value : values) {
-        sum += value.get();
-      }
-      unigramCount.set(sum);
-      context.write(key, unigramCount);
+  public void reduce(Text key, Iterable<IntWritable> values, Context context)
+      throws IOException, InterruptedException {
+    int sum = 0;
+    for (IntWritable value : values) {
+      sum += value.get();
     }
+    unigramCount.set(sum);
+    context.write(key, unigramCount);
+  }
+
   }
 
   // // Job2: Calculate TF values
