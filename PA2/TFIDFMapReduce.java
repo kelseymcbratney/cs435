@@ -145,7 +145,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
   public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-      int articleCount = context.getConfiguration().getLong("total_records", 0);
+      int articleCount = (int) context.getConfiguration().getLong("total_records", 0L);
       int unigramCount = 0;
       List<String> tfList = new ArrayList<String>();
 
@@ -192,7 +192,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
     // job3
     Job job3 = Job.getInstance(conf, "Job3");
-    job3.set("total_records", counter.getValue().toString());
+    job3.getConfiguration().set("total_records", Long.toString(counter.getValue()));
     FileInputFormat.addInputPath(job3, new Path(args[2]));
     FileOutputFormat.setOutputPath(job3, new Path(args[3]));
     job3.setJarByClass(TFIDFMapReduce.class);
