@@ -86,39 +86,23 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       unigramTreeMap = new TreeMap<DoubleWritable, Text>();
     }
 
-    public String generateSummary(List<String> tfidfValues) throws IOException, InterruptedException {
-      String foo = "foo";
-      return foo;
-      // // Sort the TF-IDF values
-      // Collections.sort(tfidfValues);
-      // // Get the top 5 TF-IDF values
-      // List<Double> top5TFIDFValues = tfidfValues.subList(tfidfValues.size() - 5,
-      // tfidfValues.size());
-      // // Calculate the average of the top 5 TF-IDF values
-      // double averageTop5TFIDFValues =
-      // top5TFIDFValues.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
-      // // Get the sentences that have TF-IDF values greater than the average of the
-      // top
-      // // 5 TF-IDF values
-      // List<String> summarySentences = new ArrayList<>();
-      // for (String tfidfValue : tfidfValues) {
-      // if (tfidfValue > averageTop5TFIDFValues) {
-      // summarySentences.add(tfidfValue);
-      // }
-      // }
-      // // Sort the sentences by the TF-IDF values
-      // Collections.sort(summarySentences);
-      // // Get the top 5 sentences
-      // List<String> top5SummarySentences =
-      // summarySentences.subList(summarySentences.size() - 5,
-      // summarySentences.size());
-      // // Generate the summary
-      // StringBuilder summary = new StringBuilder();
-      // for (String sentence : top5SummarySentences) {
-      // summary.append(sentence);
-      // summary.append("\n");
-      // }
-      // return summary.toString();
+    public String generateSummary(List<String> tfidfValues, HashMap<String, Double> hashMap)
+        throws IOException, InterruptedException {
+      StringBuilder summary = new StringBuilder();
+      List<String> sentences = new ArrayList<>();
+      for (String tfidfValue : tfidfValues) {
+        String[] tfidfValueSplit = tfidfValue.toString().split("\t");
+        String docID = tfidfValueSplit[0].toString();
+        String sentence = tfidfValueSplit[1].toString();
+        Double unigramTFIDF = hashMap.get(docID + "\t" + sentence);
+        sentences.add(sentence + "\t" + unigramTFIDF);
+      }
+      Collections.sort(sentences, Collections.reverseOrder());
+      for (int i = 0; i < 3; i++) {
+        String[] sentenceSplit = sentences.get(i).split("\t");
+        summary.append(sentenceSplit[0] + ". ");
+      }
+      return summary.toString();
 
     }
 
@@ -134,14 +118,13 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
           hashMap.put(key + "\t" + valueSplit[1].toString(),
               Double.parseDouble(valueSplit[2].toString())); // docID, (Unigram TFIDF)
         } else if (valueSplit[0].startsWith("B")) {
-
           sentences.add(valueSplit[1].toString());
         }
 
       }
 
-      String summary = generateSummary(sentences);
-      context.write(NullWritable.get(), new Text(sentences.toString()));
+      String summary = generateSummary(sentences, hashMap);
+      context.write(NullWritable.get(), new Text(summary));
     }
   }
 
