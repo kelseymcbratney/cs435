@@ -75,7 +75,6 @@ public class TFIDFMapReduce extends Configured implements Tool {
     private Text docID = new Text();
     private Text termFrequency = new Text();
     private Text unigram = new Text();
-    private Text tf = new Text();
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
       String[] values = value.toString().split("\t");
@@ -94,7 +93,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
       // Calculate max frequency for the article
       int maxFrequency = 0;
-      List<String> tfList = new ArrayList<String>();
+      List<String> tfList = new List<String>();
 
       for (Text value : values) {
         tfList.add(value.toString());
@@ -111,38 +110,61 @@ public class TFIDFMapReduce extends Configured implements Tool {
         String unigram = tfValues[0];
         double tf = Double.parseDouble(tfValues[1]);
         tf = 0.5 + (0.5 * (tf / maxFrequency));
-        context.write(key, new Text(unigram + "\t" + tf));
+        context.write(key, new Text(unigram + "\t" + tf)); // DocID , (Unigram termFrequency)
       }
     }
   }
 
   // Job3: Calculate IDF and TF-IDF values
-  // public static class Job3Mapper extends Mapper<Text, Text, Text, Text> {
-  // public void map(Text key, Text value, Context context) throws IOException,
-  // InterruptedException {
-  // // Input: docID, TF value
-  // // Calculate IDF and TF-IDF values
-  // // Output: docID, TF-IDF value
-  // }
-  // }
-  //
-  // public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
-  // private long N;
-  //
-  // protected void setup(Context context) throws IOException,
-  // InterruptedException {
-  // // Fetch the total number of documents from a Counter (set in a previous job)
-  // N = context.getConfiguration().getLong("total_documents", 0);
-  // }
-  //
-  // public void reduce(Text key, Iterable<Text> values, Context context) throws
-  // IOException, InterruptedException {
-  // // Calculate IDF and TF-IDF values using the provided formula
-  // // Output: docID, TF-IDF value
-  // pass
-  // }
-  //
-  // }
+
+  public static class Job3Mapper extends Mapper<Text, Text, Text, Text> {
+
+    private Text docID = new Text();
+    private Text termFrequency = new Text();
+    private Text unigram = new Text();
+
+    public void map(Text key, Text value, Context context) throws IOException,
+        InterruptedException {
+      String[] values = value.toString().split("\t");
+      if (values.length >= 3) {
+        docID.set(values[0]);
+        unigram.set(values[1]);
+        termFrequency.set(values[2]);
+        context.write(docID, new Text(unigram + "\t" + termFrequency)); // DocID , (Unigram termFrequency)
+      }
+    }
+  }
+
+  public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
+    private long articleCount = 0;
+
+    protected void setup(Context context) throws IOException,
+        InterruptedException {
+      // Fetch the total number of documents from a Counter (set in a previous job)
+      articleCount = context.getConfiguration().getLong("total_documents", 0);
+    }
+
+    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+      int unigramCount = 0;
+      List<String> tfList = new List<String>();
+
+      for (Text value : values) {
+        tfList.add(value.toString());
+        unigramCount += 1;
+      }
+
+      for (String value : tfList) {
+        String[] tfValues = value.toString().split("\t");
+        String unigram = tfValues[0];
+        double tf = Double.parseDouble(tfValues[1]);
+        double idf = Math.log10(articleCount / unigramCount);
+        double tfidf = tf * idf;
+        context.write(key, new Text(unigram + "\t" + tfidf)); // DocID , (Unigram TF-IDF)
+      }
+
+    }
+
+  }
 
   public int run(String[] args) throws Exception {
     Configuration conf = new Configuration();
@@ -156,7 +178,6 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job1.setOutputKeyClass(Text.class);
     job1.setOutputValueClass(IntWritable.class);
 
-    Configuration conf2 = new Configuration();
     // job2
     Job job2 = Job.getInstance(conf, "Job2");
     FileInputFormat.addInputPath(job2, new Path(args[1]));
@@ -167,21 +188,29 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job2.setOutputKeyClass(Text.class);
     job2.setOutputValueClass(Text.class);
 
+    // job3
     Job job3 = Job.getInstance(conf, "Job3");
+    FileInputFormat.addInputPath(job3, new Path(args[2]));
+    FileOutputFormat.setOutputPath(job3, new Path(args[3]));
+    job3.setJarByClass(TFIDFMapReduce.class);
+    job3.setMapperClass(Job3Mapper.class);
+    job3.setReducerClass(Job3Reducer.class);
+    job3.setOutputKeyClass(Text.class);
+    job3.setOutputValueClass(Text.class);
 
     JobControl jobControl = new JobControl("TFIDFJob");
     ControlledJob controlledJob1 = new ControlledJob(job1.getConfiguration());
     ControlledJob controlledJob2 = new ControlledJob(job2.getConfiguration());
-    // ControlledJob controlledJob3 = new ControlledJob(job3.getConfiguration());
+    ControlledJob controlledJob3 = new ControlledJob(job3.getConfiguration());
 
     // Add dependencies between jobs
     controlledJob2.addDependingJob(controlledJob1);
-    // controlledJob3.addDependingJob(controlledJob2);
+    controlledJob3.addDependingJob(controlledJob2);
 
     // Add the controlled jobs to the JobControl
     jobControl.addJob(controlledJob1);
     jobControl.addJob(controlledJob2);
-    // jobControl.addJob(controlledJob3);
+    jobControl.addJob(controlledJob3);
 
     // Start the JobControl thread
     Thread jobControlThread = new Thread(jobControl);
