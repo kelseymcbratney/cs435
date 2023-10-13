@@ -117,7 +117,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
   // Job3: Calculate IDF and TF-IDF values
 
-  public static class Job3Mapper extends Mapper<Text, Text, Text, Text> {
+  public static class Job3Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
     private Text docID = new Text();
     private Text termFrequency = new Text();
