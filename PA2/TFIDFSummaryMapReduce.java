@@ -132,7 +132,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         String[] valueSplit = value.toString().split("\t");
         if (valueSplit[0].startsWith("A")) {
           hashMap.put(key + "\t" + valueSplit[1].toString(),
-              new DoubleWritable(Double.parseDouble(valueSplit[2].toString())));
+              Double.parseDouble(valueSplit[2].toString()));
         } else if (valueSplit[0].startsWith("B")) {
           tfidfValues.add(valueSplit[1].toString());
         }
