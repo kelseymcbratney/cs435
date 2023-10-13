@@ -151,7 +151,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job2.setMapperClass(Job2Mapper.class);
     job2.setReducerClass(Job2Reducer.class);
     job2.setOutputKeyClass(Text.class);
-    job2.setOutputValueClass(Text.class);
+    job2.setOutputValueClass(IntWritable.class);
 
     Configuration conf3 = new Configuration();
     Job job3 = Job.getInstance(conf3, "Job3");
