@@ -135,7 +135,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     }
   }
 
-  public static class Job3Reducer extends Reducer<LongWritable, Text, Text, Text> {
+  public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
     private long articleCount = 0;
 
     protected void setup(Context context) throws IOException,
