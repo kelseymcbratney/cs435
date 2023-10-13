@@ -20,8 +20,7 @@ import org.apache.hadoop.util.Tool;
 public class TFIDFMapReduce extends Configured implements Tool {
   // Job1: Extract docID and article body
   public static class Job1Mapper extends Mapper<Object, Text, Text, IntWritable> {
-    private Text docID = new Text();
-    private Text unigram = new Text();
+    private Text unigramKey = new Text();
     private IntWritable defaultOne = new IntWritable(1);
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -29,15 +28,16 @@ public class TFIDFMapReduce extends Configured implements Tool {
       String line = value.toString();
       int delimIndex = line.indexOf("<====>");
       if (delimIndex >= 0) {
-        docID.set(line.substring(0, delimIndex).trim());
+        String docID = line.substring(0, delimIndex).trim();
         String body = line.substring(delimIndex + 8).trim();
 
         // Remove non-alphanumeric characters and split into unigrams
         String[] words = body.split("[^A-Za-z0-9]+");
         for (String word : words) {
           if (!word.isEmpty()) {
-            unigram.set(docID.toString() + '\t' + word.toLowerCase());
-            context.write(unigram, defaultOne); // docID, Unigram, Count
+            // Emit key-value pair as "documentID\tunigram"
+            unigramKey.set(docID + '\t' + word.toLowerCase());
+            context.write(unigramKey, defaultOne); // docID, Unigram, Count
           }
         }
       }
