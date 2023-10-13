@@ -46,8 +46,8 @@ public class TFIDFMapReduce extends Configured implements Tool {
           for (String word : words) {
             if (!word.isEmpty()) {
               docID.set(docIDString);
-              unigram.set(word + "\t" + defaultOne);
-              context.write(docID, unigram);
+              unigram.set(docID + "\t" + word);
+              context.write(unigram, defaultOne)
             }
           }
         }
