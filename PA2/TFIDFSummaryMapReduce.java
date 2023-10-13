@@ -88,21 +88,10 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
 
     public String generateSummary(List<String> tfidfValues, HashMap<String, Double> hashMap)
         throws IOException, InterruptedException {
-      StringBuilder summary = new StringBuilder();
-      List<String> sentences = new ArrayList<>();
-      for (String tfidfValue : tfidfValues) {
-        String[] tfidfValueSplit = tfidfValue.toString().split("\t");
-        String docID = tfidfValueSplit[0].toString();
-        String sentence = tfidfValueSplit[1].toString();
-        Double unigramTFIDF = hashMap.get(docID + "\t" + sentence);
-        sentences.add(sentence + "\t" + unigramTFIDF);
-      }
-      Collections.sort(sentences, Collections.reverseOrder());
-      for (int i = 0; i < 3; i++) {
-        String[] sentenceSplit = sentences.get(i).split("\t");
-        summary.append(sentenceSplit[0] + ". ");
-      }
-      return summary.toString();
+      // for (tfidfValue : tfidfValues){
+      // return tfidfValue;
+      // }
+      return "hello";
 
     }
 
@@ -116,7 +105,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
         String[] valueSplit = value.toString().split("\t");
         if (valueSplit[0].startsWith("A")) {
           hashMap.put(key + "\t" + valueSplit[1].toString(),
-              Double.parseDouble(valueSplit[2].toString())); // docID, (Unigram TFIDF)
+              Double.parseDouble(valueSplit[2].toString())); // docID, (Unigram=TFIDF)
         } else if (valueSplit[0].startsWith("B")) {
           sentences.add(valueSplit[1].toString());
         }
@@ -124,7 +113,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
       }
 
       String summary = generateSummary(sentences, hashMap);
-      context.write(NullWritable.get(), new Text(summary));
+      context.write(NullWritable.get(), new Text(hashMap.toString()));
     }
   }
 
