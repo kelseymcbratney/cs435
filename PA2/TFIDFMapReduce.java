@@ -14,6 +14,7 @@ import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.util.Tool;
 
 public class TFIDFMapReduce extends Configured implements Tool {
@@ -131,7 +132,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
   //
   // }
 
-  public static void main(String[] args) throws Exception {
+  public int run(String[] args) throws Exception {
     Configuration conf = new Configuration();
     Job job1 = Job.getInstance(conf, "Job1");
     // Set job1 Mapper, Reducer, InputFormat, and OutputFormat
@@ -167,5 +168,10 @@ public class TFIDFMapReduce extends Configured implements Tool {
       Thread.sleep(1000);
     }
     System.exit(jobControl.getFailedJobList().size());
+  }
+
+  public static void main(String[] args) throws Exception {
+    int res = ToolRunner.run(new Configuration(), new Job(), args);
+    System.exit(res);
   }
 }
