@@ -72,12 +72,14 @@ public class TFIDFMapReduce extends Configured implements Tool {
     private Text docID = new Text();
     private IntWritable termFrequency = new IntWritable();
 
-    public void map(Object key, Text value, Context context) throws IOException,
-        InterruptedException {
+    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
       String[] values = value.toString().split("\t");
-      docID.set(values[0]);
-      termFrequency.set(Integer.parseInt(values[1]));
-      context.write(docID, termFrequency);
+      if (values.length >= 3) {
+        docID.set(values[0]);
+        int tf = Integer.parseInt(values[2]); // Extract TF from the third column
+        termFrequency.set(tf);
+        context.write(docID, termFrequency);
+      }
     }
   }
 
@@ -133,7 +135,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
   public int run(String[] args) throws Exception {
     Configuration conf1 = new Configuration();
     // job1
-    Job job1 = Job.getInstance(conf1, "Job1");
+    Job job1 = Job.getInstance(conf, "Job1");
     FileInputFormat.addInputPath(job1, new Path(args[0]));
     FileOutputFormat.setOutputPath(job1, new Path(args[1]));
     job1.setJarByClass(TFIDFMapReduce.class);
@@ -144,7 +146,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
     Configuration conf2 = new Configuration();
     // job2
-    Job job2 = Job.getInstance(conf2, "Job2");
+    Job job2 = Job.getInstance(conf, "Job2");
     FileInputFormat.addInputPath(job2, new Path(args[1]));
     FileOutputFormat.setOutputPath(job2, new Path(args[2]));
     job2.setJarByClass(TFIDFMapReduce.class);
@@ -153,8 +155,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     job2.setOutputKeyClass(Text.class);
     job2.setOutputValueClass(IntWritable.class);
 
-    Configuration conf3 = new Configuration();
-    Job job3 = Job.getInstance(conf3, "Job3");
+    Job job3 = Job.getInstance(conf, "Job3");
 
     JobControl jobControl = new JobControl("TFIDFJob");
     ControlledJob controlledJob1 = new ControlledJob(job1.getConfiguration());
