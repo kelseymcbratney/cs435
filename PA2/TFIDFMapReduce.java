@@ -192,7 +192,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
     // job3
     Job job3 = Job.getInstance(conf, "Job3");
-    job3.set("total_records", counter.getValues().toString());
+    job3.set("total_records", counter.getValue().toString());
     FileInputFormat.addInputPath(job3, new Path(args[2]));
     FileOutputFormat.setOutputPath(job3, new Path(args[3]));
     job3.setJarByClass(TFIDFMapReduce.class);
