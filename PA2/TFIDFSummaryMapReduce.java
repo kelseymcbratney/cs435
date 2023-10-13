@@ -140,7 +140,7 @@ public class TFIDFSummaryMapReduce extends Configured implements Tool {
 
       }
 
-      String summary = generateSummary(tfidfValues);
+      String summary = generateSummary(sentences);
       context.write(NullWritable.get(), new Text(sentences.toString()));
     }
   }
