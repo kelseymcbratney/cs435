@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class TFIDFSummaryMapReduce extends Configured implements Tool {
   // Job1: Calculate TF-IDF values
