@@ -16,6 +16,8 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Counter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +26,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class TFIDFMapReduce extends Configured implements Tool {
+  public static enum Counters {
+    TOTAL_RECORDS
+  }
+
   // Job1: Extract docID and article body
   public static class Job1Mapper extends Mapper<Object, Text, Text, IntWritable> {
     private Text docID = new Text();
@@ -32,6 +38,8 @@ public class TFIDFMapReduce extends Configured implements Tool {
     private static final Pattern docIDPattern = Pattern.compile("<====>(\\d+)<====>");
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+      context.getCounter(Counters.TOTAL_RECORDS).increment(1);
+
       String line = value.toString();
 
       Matcher docIDMatcher = docIDPattern.matcher(line);
@@ -136,15 +144,8 @@ public class TFIDFMapReduce extends Configured implements Tool {
   }
 
   public static class Job3Reducer extends Reducer<Text, Text, Text, Text> {
-    private long articleCount = 0;
-
-    protected void setup(Context context) throws IOException,
-        InterruptedException {
-      // Fetch the total number of total_documents
-      articleCount = context.getConfiguration().getLong("total_documents", 0);
-    }
-
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+      int articleCount = context.getConfiguration().getLong("total_records", 0);
       int unigramCount = 0;
       List<String> tfList = new ArrayList<String>();
 
@@ -170,6 +171,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
     Configuration conf = new Configuration();
     // job1
     Job job1 = Job.getInstance(conf, "Job1");
+    Counter counter = job1.getCounters().findCounter(Counters.TOTAL_RECORDS);
     FileInputFormat.addInputPath(job1, new Path(args[0]));
     FileOutputFormat.setOutputPath(job1, new Path(args[1]));
     job1.setJarByClass(TFIDFMapReduce.class);
@@ -190,6 +192,7 @@ public class TFIDFMapReduce extends Configured implements Tool {
 
     // job3
     Job job3 = Job.getInstance(conf, "Job3");
+    job3.set("total_records", counter.getValues().toString());
     FileInputFormat.addInputPath(job3, new Path(args[2]));
     FileOutputFormat.setOutputPath(job3, new Path(args[3]));
     job3.setJarByClass(TFIDFMapReduce.class);
