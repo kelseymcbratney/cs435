@@ -1,0 +1,6 @@
+[submodule "PA3"]
+	path = PA3
+	url = https://github.com/kelseymcbratney/CS435-PA3
+[submodule "Term-Project"]
+	path = Term-Project
+	url = https://github.com/kelseymcbratney/CS435-Term-Project
