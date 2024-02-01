@@ -177,7 +177,7 @@ public class NgramMapReduce extends Configured implements Tool {
       if (runJob(conf, args[0], args[1] + p.toString()) != 0)
         return 1; // error
     }
-    return 0; // success
+    return 0;
   }
 
 }
